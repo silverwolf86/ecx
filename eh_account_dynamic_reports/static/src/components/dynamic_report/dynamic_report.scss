@@ -1,0 +1,387 @@
+// ============================================================================
+// ERP Heritage
+// Copyright (C) 2026 (https://www.erpheritage.com.au/)
+// ============================================================================
+
+.eh_dr {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #f8f9fa;
+
+    .eh_dr_topbar {
+        background: #ffffff;
+        padding: 16px 20px;
+        border-bottom: 1px solid #dee2e6;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .eh_dr_titlebar {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .eh_dr_title_block {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .eh_dr_title {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #1A2C3D;
+    }
+
+    .eh_dr_subtitle {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .eh_dr_currency_badge,
+    .eh_dr_period_badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #F4EFE6;
+        color: #1A2C3D;
+        border: 1px solid #C9A372;
+        letter-spacing: 0.02em;
+    }
+
+    .eh_dr_currency_badge--multi {
+        background: #FFE9D6;
+        border-color: #DC9450;
+    }
+
+    .eh_dr_period_badge {
+        background: #ffffff;
+        color: #3A4A5C;
+        border-color: #e0e3e8;
+    }
+
+    .eh_dr_actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .eh_dr_saved_view_select {
+        padding: 4px 8px;
+        border: 1px solid #C9A372;
+        border-radius: 4px;
+        background: #FBF8F2;
+        color: #1A2C3D;
+        font-size: 0.85rem;
+        max-width: 160px;
+        cursor: pointer;
+
+        &:hover {
+            border-color: #A07A3F;
+        }
+    }
+
+    .eh_dr_collapse_toggle {
+        font-size: 0.85rem;
+        text-decoration: none;
+        color: #3A4A5C;
+
+        &:hover {
+            color: #A07A3F;
+        }
+    }
+
+    .eh_dr_filter_count {
+        background: #C9A372;
+        color: #1A2C3D;
+        padding: 0 6px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.7rem;
+    }
+
+    .eh_dr_filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: flex-end;
+    }
+
+    .eh_dr_filters_advanced {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px dashed #dee2e6;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .eh_dr_filter_group {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .eh_dr_filter_actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+
+    .eh_dr_filter {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin: 0;
+
+        > span {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        > input[type="date"],
+        > input[type="search"],
+        > input[type="text"],
+        > select {
+            padding: 4px 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background: #ffffff;
+            min-width: 160px;
+        }
+
+        &.eh_dr_filter_wide {
+            flex: 1 1 220px;
+            min-width: 220px;
+
+            > select[multiple] {
+                min-height: 80px;
+            }
+        }
+
+        &.eh_dr_check {
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+
+            > input[type="checkbox"] {
+                margin: 0;
+            }
+
+            > span {
+                font-size: 0.9rem;
+                font-weight: 400;
+                color: #495057;
+                text-transform: none;
+                letter-spacing: 0;
+            }
+        }
+    }
+
+    .eh_dr_more_btn {
+        font-size: 0.78rem;
+        text-align: left;
+        text-decoration: none;
+        color: #A07A3F;
+
+        &:hover {
+            color: #1A2C3D;
+        }
+    }
+
+    .eh_dr_chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #f0f2f5;
+    }
+
+    .eh_dr_chips_label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #6c757d;
+        letter-spacing: 0.05em;
+        margin-right: 4px;
+    }
+
+    .eh_dr_chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 4px 2px 10px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        background: #1A2C3D;
+        color: #F4EFE6;
+        border: 1px solid #1A2C3D;
+    }
+
+    .eh_dr_chip_x {
+        background: rgba(255, 255, 255, 0.1);
+        border: 0;
+        border-radius: 50%;
+        color: #F4EFE6;
+        cursor: pointer;
+        font-size: 0.95rem;
+        line-height: 1;
+        height: 18px;
+        width: 18px;
+        padding: 0;
+
+        &:hover {
+            background: #C9A372;
+            color: #1A2C3D;
+        }
+    }
+
+    .eh_dr_body {
+        flex: 1;
+        overflow: auto;
+        padding: 16px 20px;
+    }
+
+    .eh_dr_brand_footer {
+        font-size: 0.72rem;
+        text-align: center;
+        padding: 8px 12px;
+        background: #1A2C3D;
+        color: #C9A372;
+        letter-spacing: 0.06em;
+        border-top: 1px solid #C9A372;
+
+        > strong {
+            color: #F4EFE6;
+        }
+
+        .eh_dr_heart {
+            color: #ffffff;
+            display: inline-block;
+            transform: translateY(1px);
+            margin: 0 2px;
+        }
+    }
+
+    .eh_dr_loading {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .eh_dr_meta_bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+        font-size: 0.78rem;
+        color: #6c757d;
+    }
+
+    .eh_dr_meta {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .eh_dr_table {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        margin: 0;
+
+        thead th {
+            background: #1A2C3D;
+            color: #F4EFE6;
+            border-bottom: 2px solid #A07A3F;
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            padding: 8px 12px;
+        }
+
+        .eh_dr_col_unit {
+            font-size: 0.7rem;
+            color: #C9A372;
+            margin-left: 4px;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 500;
+        }
+
+        tbody tr {
+            cursor: pointer;
+            transition: background-color 0.1s ease;
+
+            &:hover {
+                background-color: #fbf8f2;
+            }
+        }
+
+        tbody td {
+            font-size: 0.9rem;
+            padding: 6px 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .eh_dr_negative {
+            color: #b03a2e;
+        }
+
+        .eh_dr_unfold_caret {
+            display: inline-block;
+            width: 18px;
+            color: #A07A3F;
+            cursor: pointer;
+        }
+
+        .eh_dr_section_row {
+            background-color: #fafbfc;
+
+            > td {
+                font-weight: 600;
+                border-top: 1px solid #dee2e6;
+            }
+        }
+
+        .eh_dr_section_row.eh_dr_total > td {
+            border-top: 2px solid #1A2C3D;
+            background-color: #f1f3f5;
+        }
+
+        .eh_dr_section_row.eh_dr_header > td {
+            background-color: #e9ecef;
+            font-size: 0.95rem;
+        }
+
+        .eh_dr_computed > td {
+            font-weight: 700;
+            background-color: #F4EFE6;
+            border-top: 2px solid #C9A372;
+        }
+
+        .eh_dr_check > td {
+            font-style: italic;
+            color: #6c757d;
+            background-color: #f8f9fa;
+        }
+    }
+}

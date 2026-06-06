@@ -1,0 +1,863 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* eh_account_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ERP Heritage Accounting Suite 19.0\n"
+"Report-Msgid-Bugs-To: info@erpheritage.com.au\n"
+"POT-Creation-Date: 2026-05-03 12:00+0000\n"
+"PO-Revision-Date: 2026-05-03 12:00+0000\n"
+"Last-Translator: ERP Heritage <info@erpheritage.com.au>\n"
+"Language-Team: sv_SE\n"
+"Language: sv_SE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_base.py:0
+msgid "%(report)s requires options['date'][%(key)s]."
+msgstr "%(report)s requires options['date'][%(key)s]."
+#. module: eh_account_base
+#: model:ir.model.constraint,message:eh_account_base.constraint_eh_account_report_saved_view_unique_per_user_code
+msgid "A user cannot save two views with the same name on the same report."
+msgstr "A user cannot save two views with the same name on the same report."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_ap_invoice_ref_regex
+msgid "AP Invoice Ref Regex"
+msgstr "AP Invoice Ref Regex"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_ap_total_regex
+msgid "AP Total Amount Regex"
+msgstr "AP Total Amount Regex"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__account_ids
+msgid "Account"
+msgstr "Account"
+#. module: eh_account_base
+#: model:ir.model,name:eh_account_base.model_eh_account_report_execution
+msgid "Accounting report execution audit log"
+msgstr "Accounting report execution audit log"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__active
+msgid "Active"
+msgstr "Active"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_sectioned.py:0
+msgid "Amount"
+msgstr "Amount"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_approval_material_change_pct
+msgid "Approval Material Change %"
+msgstr "Approval Material Change %"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Approval Material Change (%)"
+msgstr "Approval Material Change (%)"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_approval_material_change_pct
+msgid "Approval Material Change Threshold (%)"
+msgstr "Approval Material Change Threshold (%)"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_assets
+msgid "Assets and Leases"
+msgstr "Assets and Leases"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_audit
+msgid "Audit Logs"
+msgstr "Audit Logs"
+#. module: eh_account_base
+#: model:ir.model.fields.selection,name:eh_account_base.selection__res_company__eh_sepa_dd_default_instrument__b2b
+msgid "B2B (business-to-business)"
+msgstr "B2B (business-to-business)"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_banking
+msgid "Banking"
+msgstr "Banking"
+#. module: eh_account_base
+#: model:ir.model,name:eh_account_base.model_eh_account_dynamic_report_handler
+msgid "Base for ERP Heritage dynamic report handlers"
+msgstr "Base for ERP Heritage dynamic report handlers"
+#. module: eh_account_base
+#: model:ir.model,name:eh_account_base.model_eh_account_dynamic_report_handler_sectioned
+msgid "Base for section based dynamic report handlers"
+msgstr "Base for section based dynamic report handlers"
+#. module: eh_account_base
+#: model:ir.model.fields.selection,name:eh_account_base.selection__res_company__eh_sepa_dd_default_instrument__cor1
+msgid "COR1 (one-day legacy)"
+msgstr "COR1 (one-day legacy)"
+#. module: eh_account_base
+#: model:ir.model.fields.selection,name:eh_account_base.selection__res_company__eh_sepa_dd_default_instrument__core
+msgid "CORE (consumer)"
+msgstr "CORE (consumer)"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_wizard_form
+msgid "Cancel"
+msgstr "Cancel"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_pdc
+msgid "Cheques (PDC)"
+msgstr "Cheques (PDC)"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__code
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__report_code
+msgid "Code"
+msgstr "Code"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_collections_grace_days
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_collections_grace_days
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Collections Grace Days"
+msgstr "Collections Grace Days"
+#. module: eh_account_base
+#: model:ir.model,name:eh_account_base.model_res_company
+msgid "Companies"
+msgstr "Companies"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__company_ids
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__company_id
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__company_ids
+msgid "Company"
+msgstr "Company"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__company_ids_key
+msgid "Company Ids Key"
+msgstr "Company Ids Key"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_execution__result_payload
+msgid ""
+"Compressed serialised report result. Used to serve cache hits without "
+"recomputation. See eh_account_base.tools.payload_codec."
+msgstr "Compressed serialised report result. Used to serve cache hits without recomputation. See eh_account_base.tools.payload_codec."
+#. module: eh_account_base
+#: model:ir.model,name:eh_account_base.model_res_config_settings
+msgid "Config Settings"
+msgstr "Config Settings"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__create_uid
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__create_uid
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__create_uid
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__create_uid
+msgid "Created by"
+msgstr "Created by"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__create_date
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__create_date
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__create_date
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__create_date
+msgid "Created on"
+msgstr "Created on"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_sectioned.py:0
+msgid "Current"
+msgstr "Current"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_dashboard_lookback_days
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_dashboard_lookback_days
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Dashboard Lookback (days)"
+msgstr "Dashboard Lookback (days)"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__date_from
+msgid "Date From"
+msgstr "Date From"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_wizard.py:0
+msgid "Date From cannot be later than Date To."
+msgstr "Date From cannot be later than Date To."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__date_to
+msgid "Date To"
+msgstr "Date To"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid ""
+"Days past invoice due date before a collection case opens automatically."
+msgstr "Days past invoice due date before a collection case opens automatically."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_asset_default_useful_life_months
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Default Asset Useful Life (months)"
+msgstr "Default Asset Useful Life (months)"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_forecast_default_history_months
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_forecast_default_history_months
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Default Forecast History (months)"
+msgstr "Default Forecast History (months)"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_forecast_default_horizon
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_forecast_default_horizon
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Default Forecast Horizon (months)"
+msgstr "Default Forecast Horizon (months)"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_lease_default_term_months
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_lease_default_term_months
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Default Lease Term (months)"
+msgstr "Default Lease Term (months)"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_sepa_dd_default_instrument
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_sepa_dd_default_instrument
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Default SEPA DD Local Instrument"
+msgstr "Default SEPA DD Local Instrument"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_asset_default_useful_life_months
+msgid "Default Useful Life (months)"
+msgstr "Default Useful Life (months)"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_collections_grace_days
+msgid "Default grace period (days) before an invoice opens a collection case."
+msgstr "Default grace period (days) before an invoice opens a collection case."
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Default horizons and history for new forecast scenarios."
+msgstr "Default horizons and history for new forecast scenarios."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_sepa_dd_default_instrument
+msgid ""
+"Default local instrument applied to new SEPA Direct Debit creditors and "
+"mandates."
+msgstr "Default local instrument applied to new SEPA Direct Debit creditors and mandates."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_ap_invoice_ref_regex
+msgid ""
+"Default regex pattern used by the bill-intake parser to extract the invoice "
+"number."
+msgstr "Default regex pattern used by the bill-intake parser to extract the invoice number."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_ap_total_regex
+msgid ""
+"Default regex pattern used by the bill-intake parser to extract the total "
+"amount."
+msgstr "Default regex pattern used by the bill-intake parser to extract the total amount."
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Default regular-expression patterns used by the bill-intake parser."
+msgstr "Default regular-expression patterns used by the bill-intake parser."
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Defaults for new fixed-asset and IFRS 16 lease contracts."
+msgstr "Defaults for new fixed-asset and IFRS 16 lease contracts."
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_sectioned.py:0
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__description
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_dynamic_report_form
+msgid "Description"
+msgstr "Description"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_account_move__display_name
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__display_name
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report_handler__display_name
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report_handler_sectioned__display_name
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__display_name
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__display_name
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__display_name
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__display_name
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "Display Name"
+#. module: eh_account_base
+#: model:ir.model.fields.selection,name:eh_account_base.selection__eh_account_report_execution__state__done
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_search
+msgid "Done"
+msgstr "Done"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__duration_ms
+msgid "Duration Ms"
+msgstr "Duration Ms"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_dynamic_report_form
+msgid "Dynamic Report"
+msgstr "Dynamic Report"
+#. module: eh_account_base
+#: model:ir.actions.act_window,name:eh_account_base.action_eh_account_dynamic_report
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_dynamic_report_tree
+msgid "Dynamic Reports"
+msgstr "Dynamic Reports"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_account_dynamic_report
+msgid "Dynamic Reports Registry"
+msgstr "Dynamic Reports Registry"
+#. module: eh_account_base
+#: model:ir.model,name:eh_account_base.model_eh_account_dynamic_report
+msgid "Dynamic accounting report"
+msgstr "Dynamic accounting report"
+#. module: eh_account_base
+#: model:res.groups,name:eh_account_base.group_eh_auditor
+msgid "EH Accounting Auditor (read-only)"
+msgstr "EH Accounting Auditor (read-only)"
+#. module: eh_account_base
+#: model:res.groups,name:eh_account_base.group_eh_manager
+msgid "EH Accounting Manager"
+msgstr "EH Accounting Manager"
+#. module: eh_account_base
+#: model:res.groups,name:eh_account_base.group_eh_user
+msgid "EH Accounting User"
+msgstr "EH Accounting User"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_account_root
+msgid "ERP Heritage"
+msgstr "ERP Heritage"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "ERP Heritage AP Automation"
+msgstr "ERP Heritage AP Automation"
+#. module: eh_account_base
+#: model:res.groups.privilege,name:eh_account_base.privilege_eh_accounting
+#: model_terms:ir.ui.view,arch_db:eh_account_base.eh_report_footer
+msgid "ERP Heritage Accounting Suite"
+msgstr "ERP Heritage Accounting Suite"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "ERP Heritage Assets and Leases"
+msgstr "ERP Heritage Assets and Leases"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "ERP Heritage Forecasting"
+msgstr "ERP Heritage Forecasting"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "ERP Heritage Operations"
+msgstr "ERP Heritage Operations"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "ERP Heritage Reporting"
+msgstr "ERP Heritage Reporting"
+#. module: eh_account_base
+#: model:ir.model,name:eh_account_base.model_eh_account_report_wizard
+msgid "ERP Heritage report run wizard"
+msgstr "ERP Heritage report run wizard"
+#. module: eh_account_base
+#: model_terms:ir.actions.act_window,help:eh_account_base.action_eh_account_dynamic_report
+msgid ""
+"Each row points at a Python handler that knows how to compute one report. "
+"Install one of the ERP Heritage report addons (for example "
+"eh_account_dynamic_reports) to populate this list."
+msgstr "Each row points at a Python handler that knows how to compute one report. Install one of the ERP Heritage report addons (for example eh_account_dynamic_reports) to populate this list."
+#. module: eh_account_base
+#: model:ir.model.fields.selection,name:eh_account_base.selection__eh_account_report_execution__state__error
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_form
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_search
+msgid "Error"
+msgstr "Error"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__error_message
+msgid "Error Message"
+msgstr "Error Message"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__executed_at
+msgid "Executed At"
+msgstr "Executed At"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__executed_by
+msgid "Executed By"
+msgstr "Executed By"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_wizard_form
+msgid "Export to Excel"
+msgstr "Export to Excel"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_gl_row_limit
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_gl_row_limit
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "GL Row Limit"
+msgstr "GL Row Limit"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_general
+msgid "General"
+msgstr "General"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__handler_model
+msgid "Handler Model"
+msgstr "Handler Model"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/dynamic_report.py:0
+msgid "Handler model is required for report %(code)r."
+msgstr "Handler model is required for report %(code)r."
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_root
+msgid "Heritage"
+msgstr "Heritage"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_reports_advanced
+msgid "Heritage Advanced"
+msgstr "Heritage Advanced"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_operations
+msgid "Heritage Operations"
+msgstr "Heritage Operations"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_period_work
+msgid "Heritage Period Work"
+msgstr "Heritage Period Work"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Heritage reporting engine and dashboard knobs."
+msgstr "Heritage reporting engine and dashboard knobs."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_company__eh_dashboard_lookback_days
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "History window scanned by the financial dashboard tiles."
+msgstr "History window scanned by the financial dashboard tiles."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_dashboard_lookback_days
+msgid ""
+"How many days of history the financial dashboard scans for AR / AP overdue "
+"and recent activity tiles. Smaller values make the dashboard refresh faster."
+msgstr "How many days of history the financial dashboard scans for AR / AP overdue and recent activity tiles. Smaller values make the dashboard refresh faster."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_account_move__id
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__id
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report_handler__id
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report_handler_sectioned__id
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__id
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__id
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__id
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__id
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__id
+msgid "ID"
+msgstr "ID"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_company__eh_approval_material_change_pct
+msgid ""
+"If a request amount changes by more than this percentage after first "
+"approval, the workflow re-approves from step zero."
+msgstr "If a request amount changes by more than this percentage after first approval, the workflow re-approves from step zero."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_company__eh_move_version
+msgid ""
+"Internal counter incremented on every account.move state change. Used by the"
+" ERP Heritage reporting cache to detect staleness. Do not edit manually."
+msgstr "Internal counter incremented on every account.move state change. Used by the ERP Heritage reporting cache to detect staleness. Do not edit manually."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_ap_invoice_ref_regex
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Invoice Ref Regex"
+msgstr "Invoice Ref Regex"
+#. module: eh_account_base
+#: model:ir.model.fields.selection,name:eh_account_base.selection__eh_account_report_execution__result_format__json
+msgid "JSON"
+msgstr "JSON"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_execution__options_snapshot
+msgid "JSON serialised options dict at execution time."
+msgstr "JSON serialised options dict at execution time."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_saved_view__options_json
+msgid "JSON-encoded options dict as captured from the OWL viewer."
+msgstr "JSON-encoded options dict as captured from the OWL viewer."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__journal_ids
+msgid "Journal"
+msgstr "Journal"
+#. module: eh_account_base
+#: model:ir.model,name:eh_account_base.model_account_move
+msgid "Journal Entry"
+msgstr "Journal Entry"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_base.py:0
+msgid "Journal Items"
+msgstr "Journal Items"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_search
+msgid "Last 7 Days"
+msgstr "Last 7 Days"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__write_uid
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__write_uid
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__write_uid
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__write_uid
+msgid "Last Updated by"
+msgstr "Last Updated by"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__write_date
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__write_date
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__write_date
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__write_date
+msgid "Last Updated on"
+msgstr "Last Updated on"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_localization
+msgid "Localization"
+msgstr "Localization"
+#. module: eh_account_base
+#: model:res.groups,comment:eh_account_base.group_eh_manager
+msgid ""
+"Manager access to ERP Heritage accounting modules: posting, configuration, "
+"override actions. Implies the standard Accounting Manager role."
+msgstr "Manager access to ERP Heritage accounting modules: posting, configuration, override actions. Implies the standard Accounting Manager role."
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Maximum journal-item rows row-driven reports will materialise."
+msgstr "Maximum journal-item rows row-driven reports will materialise."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_gl_row_limit
+msgid ""
+"Maximum journal-item rows the General Ledger and similar row-driven reports "
+"will materialise before refusing to render. Higher values render larger "
+"reports but use more memory."
+msgstr "Maximum journal-item rows the General Ledger and similar row-driven reports will materialise before refusing to render. Higher values render larger reports but use more memory."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_company__eh_gl_row_limit
+msgid "Maximum row materialisation cap for row-driven reports."
+msgstr "Maximum row materialisation cap for row-driven reports."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__move_version_at_start
+msgid "Move Version At Start"
+msgstr "Move Version At Start"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_company__eh_move_version
+msgid "Move Version Counter"
+msgstr "Move Version Counter"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__name
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__name
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__name
+msgid "Name"
+msgstr "Name"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_lease_default_term_months
+msgid "New IFRS 16 lease contracts start with this term."
+msgstr "New IFRS 16 lease contracts start with this term."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_asset_default_useful_life_months
+msgid "New fixed-asset records start with this depreciation term."
+msgstr "New fixed-asset records start with this depreciation term."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_forecast_default_horizon
+msgid "New forecast scenarios default to this horizon length."
+msgstr "New forecast scenarios default to this horizon length."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_forecast_default_history_months
+msgid "New forecast scenarios default to this many months of input series."
+msgstr "New forecast scenarios default to this many months of input series."
+#. module: eh_account_base
+#: model_terms:ir.actions.act_window,help:eh_account_base.action_eh_account_dynamic_report
+msgid "No dynamic reports registered yet."
+msgstr "No dynamic reports registered yet."
+#. module: eh_account_base
+#: model_terms:ir.actions.act_window,help:eh_account_base.action_eh_account_report_execution
+msgid "No report executions yet."
+msgstr "No report executions yet."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__notes
+msgid "Notes"
+msgstr "Notes"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_dynamic_report__handler_model
+msgid "Odoo abstract model name implementing the report handler."
+msgstr "Odoo abstract model name implementing the report handler."
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/saved_view.py:0
+msgid "Only the owner can delete a saved view (%s)."
+msgstr "Only the owner can delete a saved view (%s)."
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_operations
+msgid "Operations"
+msgstr "Operations"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Operations defaults for collections, AP intake, and SEPA."
+msgstr "Operations defaults for collections, AP intake, and SEPA."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__options_hash
+msgid "Options Hash"
+msgstr "Options Hash"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__options_json
+msgid "Options Json"
+msgstr "Options Json"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__options_snapshot
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_form
+msgid "Options Snapshot"
+msgstr "Options Snapshot"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_saved_view__user_id
+msgid ""
+"Owner of the view. The owner can edit and delete; other users can read it "
+"only when shared is True."
+msgstr "Owner of the view. The owner can edit and delete; other users can read it only when shared is True."
+#. module: eh_account_base
+#: model:ir.model.fields.selection,name:eh_account_base.selection__eh_account_report_execution__result_format__pdf
+msgid "PDF"
+msgstr "PDF"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__partner_ids
+msgid "Partner"
+msgstr "Partner"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Pattern used to extract the invoice number from raw email or text."
+msgstr "Pattern used to extract the invoice number from raw email or text."
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_payments
+msgid "Payments and SEPA"
+msgstr "Payments and SEPA"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_res_config_settings__eh_approval_material_change_pct
+msgid ""
+"Percentage change to a request amount that triggers a re-approval (rolls the"
+" workflow back to step zero)."
+msgstr "Percentage change to a request amount that triggers a re-approval (rolls the workflow back to step zero)."
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Percentage change to a request amount that triggers a re-approval."
+msgstr "Percentage change to a request amount that triggers a re-approval."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__posted_only
+msgid "Posted Only"
+msgstr "Posted Only"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_sectioned.py:0
+msgid "Previous period"
+msgstr "Previous period"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_sectioned.py:0
+msgid "Prior"
+msgstr "Prior"
+#. module: eh_account_base
+#: model:res.groups,comment:eh_account_base.group_eh_user
+msgid ""
+"Read and operational access to ERP Heritage accounting modules. Implies the "
+"standard Accounting User role."
+msgstr "Read and operational access to ERP Heritage accounting modules. Implies the standard Accounting User role."
+#. module: eh_account_base
+#: model:res.groups,comment:eh_account_base.group_eh_auditor
+msgid ""
+"Read-only auditor: visibility on every ERP Heritage audit log without write "
+"access. Cannot post, edit, or delete operational data."
+msgstr "Read-only auditor: visibility on every ERP Heritage audit log without write access. Cannot post, edit, or delete operational data."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__report_id
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_search
+msgid "Report"
+msgstr "Report"
+#. module: eh_account_base
+#: model:ir.actions.act_window,name:eh_account_base.action_eh_account_report_execution
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_account_report_execution
+msgid "Report Audit Log"
+msgstr "Report Audit Log"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__report_code
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__report_code
+msgid "Report Code"
+msgstr "Report Code"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_form
+msgid "Report Execution"
+msgstr "Report Execution"
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_audit_report_execution
+msgid "Report Execution Audit"
+msgstr "Report Execution Audit"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_tree
+msgid "Report Executions"
+msgstr "Report Executions"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_dynamic_report_form
+msgid "Report Name"
+msgstr "Report Name"
+#. module: eh_account_base
+#: model:ir.model.constraint,message:eh_account_base.constraint_eh_account_dynamic_report_unique_code
+msgid "Report code must be unique."
+msgstr "Report code must be unique."
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_execution.py:0
+msgid "Report execution audit rows are append-only. Forbidden field(s): %s"
+msgstr "Report execution audit rows are append-only. Forbidden field(s): %s"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_execution.py:0
+msgid ""
+"Report execution audit rows cannot be deleted. Reason: durable compliance "
+"trail."
+msgstr "Report execution audit rows cannot be deleted. Reason: durable compliance trail."
+#. module: eh_account_base
+#: model:ir.ui.menu,name:eh_account_base.menu_eh_config_reports
+msgid "Reports"
+msgstr "Reports"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__result_format
+msgid "Result Format"
+msgstr "Result Format"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__result_hash
+msgid "Result Hash"
+msgstr "Result Hash"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__result_payload
+msgid "Result Payload"
+msgstr "Result Payload"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__row_count
+msgid "Row Count"
+msgstr "Row Count"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_wizard_form
+msgid "Run Report"
+msgstr "Run Report"
+#. module: eh_account_base
+#: model:ir.model.fields.selection,name:eh_account_base.selection__eh_account_report_execution__state__running
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_search
+msgid "Running"
+msgstr "Running"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_execution__options_hash
+msgid "SHA-256 of the canonicalised options dict."
+msgstr "SHA-256 of the canonicalised options dict."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_execution__result_hash
+msgid "SHA-256 of the rendered output for xlsx and pdf formats."
+msgstr "SHA-256 of the rendered output for xlsx and pdf formats."
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_sectioned.py:0
+msgid "Same period last year"
+msgstr "Same period last year"
+#. module: eh_account_base
+#: model:ir.model,name:eh_account_base.model_eh_account_report_saved_view
+msgid "Saved filter view for a dynamic report"
+msgstr "Saved filter view for a dynamic report"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_dynamic_report__sequence
+msgid "Sequence"
+msgstr "Sequence"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__served_from_execution_id
+msgid "Served From Execution"
+msgstr "Served From Execution"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__shared
+msgid "Shared"
+msgstr "Shared"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_wizard__show_zero
+msgid "Show Zero"
+msgstr "Show Zero"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_execution__company_ids_key
+msgid ""
+"Sorted comma separated representation of company_ids. Used for strict "
+"equality in the cache lookup; an m2m IN filter would match overlapping sets "
+"and return wrong scoped rows."
+msgstr "Sorted comma separated representation of company_ids. Used for strict equality in the cache lookup; an m2m IN filter would match overlapping sets and return wrong scoped rows."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_execution__report_code
+msgid ""
+"Stable identifier for the report definition (for example 'profit_loss')."
+msgstr "Stable identifier for the report definition (for example 'profit_loss')."
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_execution__state
+msgid "State"
+msgstr "State"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_search
+msgid "Status"
+msgstr "Status"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_execution__move_version_at_start
+msgid ""
+"Sum of res_company.eh_move_version at execution start across the "
+"company_ids. Component of the cache key."
+msgstr "Sum of res_company.eh_move_version at execution start across the company_ids. Component of the cache key."
+#. module: eh_account_base
+#: model_terms:ir.actions.act_window,help:eh_account_base.action_eh_account_report_execution
+msgid ""
+"This log records every accounting report rendered through the ERP Heritage "
+"reporting engine. Each row captures the user, options, duration, and result "
+"hash for compliance and reproducibility."
+msgstr "This log records every accounting report rendered through the ERP Heritage reporting engine. Each row captures the user, options, duration, and result hash for compliance and reproducibility."
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_search
+msgid "Today"
+msgstr "Today"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_res_config_settings__eh_ap_total_regex
+#: model_terms:ir.ui.view,arch_db:eh_account_base.res_config_settings_view_form_eh
+msgid "Total Amount Regex"
+msgstr "Total Amount Regex"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_tree
+msgid "Total ms"
+msgstr "Total ms"
+#. module: eh_account_base
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_tree
+msgid "Total rows"
+msgstr "Total rows"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/dynamic_report.py:0
+msgid ""
+"Unknown handler model %(model)r for report %(code)r. Did you forget to "
+"install the addon that provides the handler?"
+msgstr "Unknown handler model %(model)r for report %(code)r. Did you forget to install the addon that provides the handler?"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/dynamic_report.py:0
+msgid "Unknown report code: %s"
+msgstr "Unknown report code: %s"
+#. module: eh_account_base
+#: model:ir.model.fields,field_description:eh_account_base.field_eh_account_report_saved_view__user_id
+#: model_terms:ir.ui.view,arch_db:eh_account_base.view_eh_account_report_execution_search
+msgid "User"
+msgstr "User"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_sectioned.py:0
+msgid "Var %"
+msgstr "Var %"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/report_handler_sectioned.py:0
+msgid "Variance"
+msgstr "Variance"
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_saved_view__shared
+msgid ""
+"When True, the view is visible to every user in the company with access to "
+"the report. The owner remains the only user who can edit or delete."
+msgstr "When True, the view is visible to every user in the company with access to the report. The owner remains the only user who can edit or delete."
+#. module: eh_account_base
+#: model:ir.model.fields,help:eh_account_base.field_eh_account_report_execution__served_from_execution_id
+msgid ""
+"When this execution served a result from a prior cached execution, this is a"
+" pointer to that prior execution. The audit log keeps one row per actual "
+"user request even when the underlying compute was reused, so compliance "
+"reporting lists every render."
+msgstr "When this execution served a result from a prior cached execution, this is a pointer to that prior execution. The audit log keeps one row per actual user request even when the underlying compute was reused, so compliance reporting lists every render."
+#. module: eh_account_base
+#: model:ir.model.fields.selection,name:eh_account_base.selection__eh_account_report_execution__result_format__xlsx
+msgid "XLSX"
+msgstr "XLSX"
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/saved_view.py:0
+msgid "options_json must be valid JSON (got %s)."
+msgstr "options_json must be valid JSON (got %s)."
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/saved_view.py:0
+msgid "options_json must encode a dict."
+msgstr "options_json must encode a dict."
+#. module: eh_account_base
+#. odoo-python
+#: code:addons/eh_account_base/models/saved_view.py:0
+msgid "options_json must not be empty."
+msgstr "options_json must not be empty."

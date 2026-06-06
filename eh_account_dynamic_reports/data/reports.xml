@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="report_trial_balance" model="eh.account.dynamic.report">
+            <field name="code">trial_balance</field>
+            <field name="name">Trial Balance</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.trial_balance</field>
+            <field name="sequence">10</field>
+            <field name="description">Standard accounting Trial Balance with opening, period movement, and closing balances per account. Single SQL pass with conditional aggregation; drill down to journal items per account.</field>
+        </record>
+
+        <record id="report_profit_and_loss" model="eh.account.dynamic.report">
+            <field name="code">profit_and_loss</field>
+            <field name="name">Profit and Loss</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.profit_and_loss</field>
+            <field name="sequence">20</field>
+            <field name="description">Period income statement with Income and Expenses sections plus Net Profit. Two SQL passes (one per section) with the standard filter set; drill down to journal items per account.</field>
+        </record>
+
+        <record id="report_balance_sheet" model="eh.account.dynamic.report">
+            <field name="code">balance_sheet</field>
+            <field name="name">Balance Sheet</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.balance_sheet</field>
+            <field name="sequence">30</field>
+            <field name="description">Cumulative point in time snapshot at date_to with Assets, Liabilities, Equity sections, plus Current Year Earnings, Total Liabilities and Equity, and an automatic Balance Check that surfaces any drift in the underlying ledger.</field>
+        </record>
+
+        <record id="report_general_ledger" model="eh.account.dynamic.report">
+            <field name="code">general_ledger</field>
+            <field name="name">General Ledger</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.general_ledger</field>
+            <field name="sequence">40</field>
+            <field name="description">Per account ledger with opening balance, every journal item in the period (date, journal, move, partner, label, debit, credit, running balance), and an account total. Drill down: account headers open the journal items list filtered to that account; entry rows open the specific journal entry form.</field>
+        </record>
+
+        <record id="report_partner_ledger" model="eh.account.dynamic.report">
+            <field name="code">partner_ledger</field>
+            <field name="name">Partner Ledger</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.partner_ledger</field>
+            <field name="sequence">50</field>
+            <field name="description">Per partner ledger with opening balance, every journal item in the period attached to that partner, and a partner total. Drill down: partner headers open the journal items list filtered to that partner; entry rows open the specific journal entry form.</field>
+        </record>
+
+        <record id="report_aged_receivable" model="eh.account.dynamic.report">
+            <field name="code">aged_receivable</field>
+            <field name="name">Aged Receivable</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.aged_receivable</field>
+            <field name="sequence">60</field>
+            <field name="description">Open customer balances at date_to bucketed by days overdue (Not Due, 0 to 30, 31 to 60, 61 to 90, 91 plus). Drill down: each partner row opens the open journal items list filtered to that partner.</field>
+        </record>
+
+        <record id="report_aged_payable" model="eh.account.dynamic.report">
+            <field name="code">aged_payable</field>
+            <field name="name">Aged Payable</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.aged_payable</field>
+            <field name="sequence">70</field>
+            <field name="description">Open vendor balances at date_to bucketed by days overdue. Same five bucket layout as Aged Receivable but scoped to liability_payable accounts and signed so the displayed amounts represent what the company owes.</field>
+        </record>
+
+        <record id="report_cash_flow" model="eh.account.dynamic.report">
+            <field name="code">cash_flow</field>
+            <field name="name">Cash Flow Statement</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.cash_flow</field>
+            <field name="sequence">80</field>
+            <field name="description">Direct method Cash Flow Statement: classifies cash affecting moves into Operating, Investing, and Financing activities by inspecting non cash counterparts. Includes Opening Cash, Closing Cash, and a Balance Check that verifies Closing equals Opening plus Net Change.</field>
+        </record>
+
+        <record id="report_customer_statement" model="eh.account.dynamic.report">
+            <field name="code">customer_statement</field>
+            <field name="name">Customer Statement</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.customer_statement</field>
+            <field name="sequence">90</field>
+            <field name="description">Per-partner statement of open invoices and recent payments on the receivable account, ordered by date with a running balance and a final amount due. Driven by the same partial-reconcile rewind as the aged report so a back-dated statement reflects what was open on that date.</field>
+        </record>
+
+        <record id="report_vendor_statement" model="eh.account.dynamic.report">
+            <field name="code">vendor_statement</field>
+            <field name="name">Vendor Statement</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.vendor_statement</field>
+            <field name="sequence">95</field>
+            <field name="description">Mirror of the customer statement on the payable side: open vendor bills and payments with a running balance and the amount the company currently owes the vendor.</field>
+        </record>
+
+        <record id="report_analytic_balance" model="eh.account.dynamic.report">
+            <field name="code">analytic_balance</field>
+            <field name="name">Analytic Balance</field>
+            <field name="handler_model">eh.account.dynamic.report.handler.analytic_balance</field>
+            <field name="sequence">100</field>
+            <field name="description">Net analytic impact per analytic account. Allocation-percentage weighted; income negated so positive rows mean net cost on the analytic and negative rows mean net contribution. One section per analytic plan.</field>
+        </record>
+
+        <record id="action_eh_report_analytic_balance" model="ir.actions.client">
+            <field name="name">Analytic Balance</field>
+            <field name="tag">eh_account_dynamic_report</field>
+            <field name="context">{'report_code': 'analytic_balance'}</field>
+        </record>
+
+        <menuitem id="menu_eh_report_analytic_balance"
+                  name="Analytic Balance"
+                  parent="account.menu_finance_reports"
+                  action="action_eh_report_analytic_balance"
+                  sequence="105"
+                  groups="eh_account_base.group_eh_user"/>
+
+    </data>
+</odoo>
