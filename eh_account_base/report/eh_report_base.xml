@@ -194,7 +194,12 @@
                 margin-bottom: 4pt;
             }
             .eh_pdf_header_company {
-                font-size: 9pt;
+                font-size: 14pt;
+                color: #6c757d;
+                margin-top: 4pt;
+            }
+            .eh_pdf_header_company_2 {
+                font-size: 10pt;
                 color: #6c757d;
                 margin-top: 4pt;
             }
@@ -214,10 +219,7 @@
     -->
     <template id="eh_report_footer">
         <div class="eh_pdf_footer">
-            <div class="eh_pdf_footer_brand">ERP Heritage Accounting Suite</div>
-            <div class="eh_pdf_footer_credit">
-                Made with <span class="eh_pdf_heart">&#x2665;</span> from Melbourne, Australia by ERP Heritage
-            </div>
+            
         </div>
     </template>
 
@@ -230,13 +232,17 @@
             optional company / period strip
     -->
     <template id="eh_report_header">
-        <div class="eh_pdf_header">
-            <div class="eh_pdf_header_brand">ERP Heritage Accounting Suite</div>
+        <div class="eh_pdf_header">         
             <h1 class="eh_pdf_title" t-out="title"/>
             <div class="eh_pdf_header_company"
                  t-if="company">
-                <t t-out="company.display_name"/>
-                <span t-if="company.country_id"> / <t t-out="company.country_id.name"/></span>
+                <t t-out="company.display_name"/>                                
+            </div>
+            <div class="eh_pdf_header_company_2">
+                <t t-out="company.vat"/>                
+            </div>
+            <div class="eh_pdf_header_company_2">
+                <t t-out="company.street"/>                
             </div>
         </div>
     </template>
@@ -255,13 +261,10 @@
     <template id="eh_clean_layout">
         <div t-attf-class="footer o_company_#{company.id if company else 'na'}_layout">
             <div class="o_footer_content d-flex border-top pt-2"
-                 style="font-size: 7.5pt; color: #6c757d; padding-top: 4pt;">
-                <div class="flex-grow-1 text-start me-2">
-                    ERP Heritage Accounting Suite
-                </div>
+                 style="font-size: 7.5pt; color: #6c757d; padding-top: 4pt;">                
                 <div class="text-end text-muted text-nowrap"
                      t-if="report_type == 'pdf'">
-                    Page <span class="page"/> / <span class="topage"/>
+                    Pagina <span class="page"/> / <span class="topage"/>
                 </div>
             </div>
         </div>

@@ -100,7 +100,7 @@ class XlsxReportWriter:
     BRAND_FONT = Font(
         name='Arial', size=8, italic=True, color='6C757D',
     )
-    BRAND_FOOTER_TEXT = "Made with 🤍 from Melbourne by ERP Heritage"
+    BRAND_FOOTER_TEXT = ""
 
     def write_payload(self, payload, meta=None):
         meta = meta if meta is not None else (payload.get('meta') or {})
@@ -148,14 +148,13 @@ class XlsxReportWriter:
         date_from = meta.get('date_from')
         date_to = meta.get('date_to')
         if date_from or date_to:
-            details.append("Period: %s to %s" % (date_from or '', date_to or ''))
+            details.append("Periodo: %s to %s" % (date_from or '', date_to or ''))
         if 'posted_only' in meta:
             details.append(
-                "Posted entries only" if meta['posted_only']
-                else "All entries (including draft)",
+                "",
             )
         if 'show_zero' in meta and meta['show_zero']:
-            details.append("Including zero balance accounts")
+            details.append("")
         if self._currency:
             if self._currency.get('multi_currency'):
                 details.append("Multi-currency scope")
@@ -175,7 +174,7 @@ class XlsxReportWriter:
         if generated_at:
             ws.cell(
                 row=self._row, column=1,
-                value="Generated: %s" % generated_at,
+                value="Fecha de Generacion: %s" % generated_at,
             ).font = self.META_FONT
             self._row += 1
 

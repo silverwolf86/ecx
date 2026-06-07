@@ -33,31 +33,17 @@
                         <div class="eh_pdf_meta">
                             <t t-set="meta" t-value="r.get('payload').get('meta', {})"/>
                             <t t-if="meta.get('date_from') and meta.get('date_to')">
-                                <span><strong>Period:</strong>
+                                <span><strong>Periodo:</strong>
                                     <t t-out="meta.get('date_from')"/> to
                                     <t t-out="meta.get('date_to')"/>
                                 </span>
                             </t>
                             <t t-elif="meta.get('date_to')">
-                                <span><strong>As at:</strong>
+                                <span><strong>A la fecha:</strong>
                                     <t t-out="meta.get('date_to')"/>
                                 </span>
-                            </t>
-                            <span><strong>Posted only:</strong>
-                                <t t-out="'Yes' if meta.get('posted_only') else 'No'"/>
-                            </span>
-                            <t t-set="curr" t-value="r.get('payload').get('currency') or {}"/>
-                            <span t-if="curr">
-                                <strong>Currency:</strong>
-                                <t t-if="curr.get('multi_currency')">Multi-currency</t>
-                                <t t-else="">
-                                    <t t-out="curr.get('name', '')"/>
-                                    <t t-if="curr.get('symbol')">
-                                        (<t t-out="curr.get('symbol')"/>)
-                                    </t>
-                                </t>
-                            </span>
-                            <span><strong>Generated:</strong>
+                            </t>                            
+                            <span><strong>Fecha Generacion:</strong>
                                 <t t-out="r.get('payload').get('generated_at', '')"/>
                             </span>
                         </div>
