@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ecx_ats_report_list" model="ir.ui.view">
+        <field name="name">ecx.ats.report.list</field>
+        <field name="model">ecx.ats.report</field>
+        <field name="arch" type="xml">
+            <list string="ATS Reports">
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ecx_ats_report_form" model="ir.ui.view">
+        <field name="name">ecx.ats.report.form</field>
+        <field name="model">ecx.ats.report</field>
+        <field name="arch" type="xml">
+            <form string="ATS Report">
+                <header>
+                    <button name="action_generate_ats" type="object" string="Generar ATS" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="company_id" groups="base.group_multi_company" domain="[('id', 'in', allowed_company_ids)]"/>
+                        <field name="date_start"/>
+                        <field name="date_end"/>
+                    </group>
+                    <group invisible="not xml_file">
+                        <field name="xml_file" filename="xml_filename" readonly="1"/>
+                        <field name="xml_filename" invisible="1"/>
+                    </group>
+                    <group invisible="not error_message">
+                        <field name="ignore_errors"/>
+                        <field name="error_message" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ecx_ats_report" model="ir.actions.act_window">
+        <field name="name">ATS</field>
+        <field name="res_model">ecx.ats.report</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_ecx_ats_report"
+              name="ATS"
+              action="action_ecx_ats_report"
+              parent="account.menu_finance_reports"
+              groups="account.group_account_user,account.group_account_manager"
+              sequence="60"/>
+
+</odoo>

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
     'name': 'Ecuador - ATS Report',
@@ -11,10 +10,11 @@
     """,
     'depends': [
         'ecx_edi',
-        'ecx_reports',
     ],
     'data': [
+        'security/ir.model.access.csv',
         'data/ats_report.xml',
+        'views/ecx_ats_report_views.xml',
     ],
     'installable': True,
     'auto_install': True,

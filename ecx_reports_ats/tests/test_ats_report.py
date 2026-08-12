@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import base64
+
 from freezegun import freeze_time
 from datetime import timedelta
 
 from odoo import Command, fields, tools
 from odoo.tests import tagged
 from odoo.addons.ecx_edi.tests.test_edi_xml import TestEcEdiCommon
-from odoo.addons.account_reports.tests.common import TestAccountReportsCommon
 
 @tagged('ats_tests_l10n', 'post_install_l10n', 'post_install', '-at_install')
-class TestAtsReport(TestEcEdiCommon, TestAccountReportsCommon):
+class TestAtsReport(TestEcEdiCommon):
 
     @classmethod
     def setUpClass(cls):
@@ -615,16 +616,19 @@ class TestAtsReport(TestEcEdiCommon, TestAccountReportsCommon):
 
     def _get_ats_xml_content(self):
         # Generate xml content of ats
-        report = self.env.ref('l10n_ec.tax_report_104')
-        options = self._generate_options(report, fields.Date.to_date('2022-01-01'), fields.Date.to_date('2023-01-01'))
-        set_time_interval_function = self.env[report._get_custom_handler_model()].l10n_ec_export_ats
-        xml_content_ats = set_time_interval_function(options)
-        return xml_content_ats['file_content']
+        ats_report = self.env['ecx.ats.report'].create({
+            'company_id': self.company_data['company'].id,
+            'date_start': fields.Date.to_date('2022-01-01'),
+            'date_end': fields.Date.to_date('2023-01-01'),
+            'ignore_errors': True,
+        })
+        ats_report.action_generate_ats()
+        return base64.b64decode(ats_report.xml_file)
 
     def assert_xml_ats_equal(self, generated_xml, expected_xml_filename):
         # Verify the expected xml against the generated xml
         with tools.file_open(f'ecx_reports_ats/tests/expected_xmls/{expected_xml_filename}', 'rb') as expected_xml_file:
             self.assertXmlTreeEqual(
-                self.get_xml_tree_from_string(generated_xml.encode()),
+                self.get_xml_tree_from_string(generated_xml),
                 self.get_xml_tree_from_string(expected_xml_file.read())
             )

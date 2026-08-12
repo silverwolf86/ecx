@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, fields, _, api
+from odoo import models, _, api
 from odoo.tools import float_repr, float_round, groupby
-from odoo.exceptions import RedirectWarning, ValidationError
+from odoo.exceptions import ValidationError
 from odoo.addons.l10n_ec.models.res_partner import PartnerIdTypeEc
 from odoo.addons.ecx_edi.models.account_move import L10N_EC_VAT_TAX_NOT_ZERO_GROUPS
 
@@ -19,44 +19,16 @@ ATS_SALE_DOCUMENT_TYPE = {
 }
 
 
-class AccountTaxReportHandler(models.AbstractModel):
-    _inherit = 'account.tax.report.handler'
+class EcxAtsReportHandler(models.AbstractModel):
+    _name = 'ecx.ats.report.handler'
+    _description = 'Ecuadorian ATS Report Handler'
 
-    def _custom_options_initializer(self, report, options, previous_options):
-        super()._custom_options_initializer(report, options, previous_options=previous_options)
-        if self.env.company.account_fiscal_country_id.code == 'EC':
-            options['buttons'].append({
-                'name': _('ATS'),
-                'sequence': 60,
-                'action': 'export_file',
-                'action_param': 'l10n_ec_export_ats',
-                'file_export_type': _('XML'),
-            })
-
-    def l10n_ec_export_ats(self, options):
-        report = self.env['account.report'].browse(options['report_id'])
-        xml_str, errors = self._generate_ats(options)
-        if errors and not options.get('l10n_ec_ats_ignore_errors'):
-            error_msg = _('While preparing the data for the ATS export, we noticed the following missing or incorrect data.') + '\n\n'
-            error_msg += '\n'.join(errors)
-            action_vals = report.export_file({**options, 'l10n_ec_ats_ignore_errors': True}, 'l10n_ec_export_ats')
-            raise RedirectWarning(error_msg, action_vals, _('Generate ATS'))
-
-        report_name = 'ATS - ' + options['date']['string'] + ' - ' + report.get_default_report_filename(options, 'xml')
-        return {
-            'file_name': report_name,
-            'file_content': xml_str,
-            'file_type': 'xml',
-        }
-
-    def _generate_ats(self, options):
+    def _generate_ats(self, date_start, date_finish):
         # Generate ATS report
         # 2.1 Company information
         company = self.env.company
         if not company.account_fiscal_country_id.code == 'EC':
             raise ValidationError(_('This report is only available for Ecuadorian companies.'))
-        date_start = fields.Date.to_date(options['date']['date_from'])
-        date_finish = fields.Date.to_date(options['date']['date_to'])
 
         sale_journals = self.env['account.journal'].search([
             ('type', '=', 'sale'),
@@ -92,7 +64,11 @@ class AccountTaxReportHandler(models.AbstractModel):
 
         errors = purchase_errors + sale_errors
 
-        return self.env['ir.qweb']._render('ecx_reports_ats.ats_report_template', values), errors
+        xml_content = self.env['ir.qweb']._render('ecx_reports_ats.ats_report_template', values)
+        # QWeb leaves blank lines where t-out elements are omitted (None values, e.g. optional fields).
+        xml_content = '\n'.join(line for line in xml_content.splitlines() if line.strip())
+
+        return xml_content, errors
 
     @api.model
     def _get_purchase_values(self, date_start, date_finish):
