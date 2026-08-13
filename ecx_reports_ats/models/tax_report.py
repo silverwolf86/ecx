@@ -168,7 +168,7 @@ class EcxAtsReportHandler(models.AbstractModel):
                 'fechaEmision': in_inv.invoice_date.strftime('%d/%m/%Y'),
                 'autorizacion': get_authorization_number(in_inv),
             }
-            if in_inv.l10n_ec_sri_payment_id.code:
+            if in_inv.l10n_ec_sri_payment_id.code and in_inv.amount_total > 500:
                 inv_values.update({
                     'formasDePago': in_inv._l10n_ec_get_formas_de_pago(),
                 })
