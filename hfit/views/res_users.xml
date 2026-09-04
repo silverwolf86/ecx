@@ -1,0 +1,16 @@
+<odoo>
+    <record id="view_users_form_inherit_branch" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.branch</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='login']/.." position="after">
+                <label for="branch_id" string="Sucursal Actual"/>
+                <field name="branch_id" String="Sucursal Actual"/>            
+                 <label for="branch_ids" string="Sucursales"/>
+                <field name="branch_ids" widget="many2many_tags" String="Sucursales"/>
+                
+            </xpath>
+        </field>
+    </record>
+</odoo>

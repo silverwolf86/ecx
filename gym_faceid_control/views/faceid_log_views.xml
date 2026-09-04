@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View for Logs -->
+    <record id="gym_faceid_log_view_tree" model="ir.ui.view">
+        <field name="name">gym.faceid.log.view.tree</field>
+        <field name="model">gym.faceid.log</field>
+        <field name="arch" type="xml">
+            <list string="FaceID Logs" create="false" edit="false" delete="false"
+                  decoration-danger="state == 'error'"
+                  decoration-success="state == 'ok'"
+                  decoration-info="state == 'pending'">
+                <field name="name"/>
+                <field name="create_date"/>
+                <field name="action"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id"/>
+                <field name="branch_id"/>
+                <field name="status_code"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Logs -->
+    <record id="gym_faceid_log_view_form" model="ir.ui.view">
+        <field name="name">gym.faceid.log.view.form</field>
+        <field name="model">gym.faceid.log</field>
+        <field name="arch" type="xml">
+            <form string="FaceID Log" create="false" edit="false" delete="false">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="info" string="Información Principal">
+                            <field name="create_date"/>
+                            <field name="action"/>
+                            <field name="partner_id"/>
+                            <field name="sale_order_id"/>
+                            <field name="branch_id"/>
+                        </group>
+                        <group name="api" string="Información de API">
+                            <field name="status_code"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payload (Petición)">
+                            <field name="payload"/>
+                        </page>
+                        <page string="Respuesta">
+                            <field name="response_text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View for Logs -->
+    <record id="gym_faceid_log_view_search" model="ir.ui.view">
+        <field name="name">gym.faceid.log.view.search</field>
+        <field name="model">gym.faceid.log</field>
+        <field name="arch" type="xml">
+            <search string="FaceID Logs">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id"/>
+                <field name="status_code"/>
+                <separator/>
+                <filter string="Con Errores" name="error" domain="[('state', '=', 'error')]"/>
+                <filter string="Exitosos" name="ok" domain="[('state', '=', 'ok')]"/>
+                <group>
+                    <filter string="Acción" name="group_by_action" context="{'group_by':'action'}"/>
+                    <filter string="Cliente" name="group_by_partner" context="{'group_by':'partner_id'}"/>
+                    <filter string="Estado" name="group_by_state" context="{'group_by':'state'}"/>
+                    <filter string="Sucursal" name="group_by_branch" context="{'group_by':'branch_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_gym_faceid_log" model="ir.actions.act_window">
+        <field name="name">Logs FaceID (ISAPI)</field>
+        <field name="res_model">gym.faceid.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="gym_faceid_log_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay logs de FaceID registrados aún.
+            </p>
+            <p>
+                Los logs se generarán automáticamente cuando las suscripciones se sincronicen con los equipos Hikvision.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menus -->
+    <!-- Opción en el menú de Configuración de Ventas / Suscripciones -->
+    <menuitem id="menu_gym_faceid_root" 
+              name="Sincronización FaceID" 
+              parent="sale.menu_sale_config" 
+              sequence="100"/>
+
+    <menuitem id="menu_gym_faceid_logs" 
+              name="Logs de Sincronización" 
+              parent="menu_gym_faceid_root" 
+              action="action_gym_faceid_log" 
+              sequence="10"/>
+
+</odoo>

@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_move_export_wizard,access.account.move.export.wizard,model_account_move_export_wizard,base.group_user,1,1,1,1
+access_sale_order_cc_history_manager,sale.order.cc.history manager,model_sale_order_cc_history,base.group_system,1,0,0,0
+access_sale_order_cc_history_user,sale.order.cc.history user,model_sale_order_cc_history,base.group_user,1,0,0,0
+access_virtuagym_log_user,virtuagym.log.user,model_virtuagym_log,base.group_user,1,0,0,0
+access_virtuagym_log_manager,virtuagym.log.manager,model_virtuagym_log,base.group_system,1,1,1,1
+access_res_branch_user,res.branch.user,model_res_branch,base.group_user,1,0,0,0
+access_res_branch_manager,res.branch.manager,model_res_branch,base.group_system,1,1,1,1
+access_subscription_group_user,subscription.group.user,model_subscription_group,base.group_user,1,0,0,0
+access_subscription_group_manager,subscription.group.manager,model_subscription_group,base.group_system,1,1,1,1
+access_credit_card_brand_user,credit.card.brand.user,model_credit_card_brand,base.group_user,1,0,0,0
+access_credit_card_brand_manager,credit.card.brand.manager,model_credit_card_brand,base.group_system,1,1,1,1
+access_credit_card_file_so_user,credit.card.file.so.user,model_credit_card_file_so,base.group_user,1,1,1,0
+access_credit_card_file_so_manager,credit.card.file.so.manager,model_credit_card_file_so,base.group_system,1,1,1,1
+access_hfit_upload_returned_excel_user,hfit.upload.returned.excel.user,model_hfit_upload_returned_excel,base.group_user,1,1,1,1
+access_hfit_pause_subscription_wizard_user,hfit.pause.subscription.wizard.user,model_hfit_pause_subscription_wizard,base.group_user,1,1,1,1

@@ -1,0 +1,40 @@
+<odoo>
+    <record id="view_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <field name="email" position="attributes">
+                <attribute name="required">True</attribute>
+            </field>
+            <field name="vat" position="attributes">
+                <attribute name="required">True</attribute>
+                <attribute name="readonly">member_id != False</attribute>
+            </field>
+            <field name="function" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="phone" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="website" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="lang" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="category_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <!-- Datos del socio, agrupados justo debajo de la cédula/RUC para que
+                 todo el bloque de identificación quede contiguo en una sola columna. -->
+            <field name="vat" position="after">
+                <field name="gender" string="Género" />
+                <field name="birthday" string="Fecha de nacimiento" />
+                <field name="member_id" string="ID de Socio Virtuagym" />
+                <field name="id_biometrico" string="ID Biométrico" groups="base.group_system" />
+                <field name="id_biometrico" string="ID Biométrico" readonly="1" groups="!base.group_system" />
+            </field>
+        </field>
+    </record>
+</odoo>

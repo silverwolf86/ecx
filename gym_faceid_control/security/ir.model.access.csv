@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_gym_faceid_log_user,gym.faceid.log.user,model_gym_faceid_log,base.group_user,1,1,1,1
+access_gym_faceid_log_manager,gym.faceid.log.manager,model_gym_faceid_log,base.group_system,1,1,1,1

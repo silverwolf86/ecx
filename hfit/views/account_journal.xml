@@ -1,0 +1,13 @@
+<odoo>
+    <record id="view_journal_form_inherit_branch" model="ir.ui.view">
+        <field name="name">account.journal.form.inherit.branch</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='type']" position="after">
+                <field name="branch_id" string="Sucursal"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

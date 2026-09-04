@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View for Logs -->
+    <record id="virtuagym_log_view_tree" model="ir.ui.view">
+        <field name="name">virtuagym.log.view.tree</field>
+        <field name="model">virtuagym.log</field>
+        <field name="arch" type="xml">
+            <list string="Logs Virtuagym" create="false" edit="false" delete="false"
+                  decoration-danger="state == 'error'"
+                  decoration-success="state == 'ok'">
+                <field name="name"/>
+                <field name="create_date"/>
+                <field name="action"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id"/>
+                <field name="branch_id"/>
+                <field name="status_code"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Logs -->
+    <record id="virtuagym_log_view_form" model="ir.ui.view">
+        <field name="name">virtuagym.log.view.form</field>
+        <field name="model">virtuagym.log</field>
+        <field name="arch" type="xml">
+            <form string="Log Virtuagym" create="false" edit="false" delete="false">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="info" string="Información Principal">
+                            <field name="create_date"/>
+                            <field name="action"/>
+                            <field name="partner_id"/>
+                            <field name="sale_order_id"/>
+                            <field name="branch_id"/>
+                        </group>
+                        <group name="api" string="Información de API">
+                            <field name="request_url"/>
+                            <field name="status_code"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payload (Petición)">
+                            <field name="payload"/>
+                        </page>
+                        <page string="Respuesta">
+                            <field name="response_text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View for Logs -->
+    <record id="virtuagym_log_view_search" model="ir.ui.view">
+        <field name="name">virtuagym.log.view.search</field>
+        <field name="model">virtuagym.log</field>
+        <field name="arch" type="xml">
+            <search string="Logs Virtuagym">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="sale_order_id"/>
+                <field name="status_code"/>
+                <separator/>
+                <filter string="Con Errores" name="error" domain="[('state', '=', 'error')]"/>
+                <filter string="Exitosos" name="ok" domain="[('state', '=', 'ok')]"/>
+                <group>
+                    <filter string="Acción" name="group_by_action" context="{'group_by':'action'}"/>
+                    <filter string="Cliente" name="group_by_partner" context="{'group_by':'partner_id'}"/>
+                    <filter string="Estado" name="group_by_state" context="{'group_by':'state'}"/>
+                    <filter string="Sucursal" name="group_by_branch" context="{'group_by':'branch_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Window Action -->
+    <record id="action_virtuagym_log" model="ir.actions.act_window">
+        <field name="name">Logs Virtuagym</field>
+        <field name="res_model">virtuagym.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="virtuagym_log_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay logs de Virtuagym registrados aún.
+            </p>
+            <p>
+                Los logs se generan automáticamente cada vez que se sincroniza un socio
+                o se crea una membresía en Virtuagym.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_virtuagym_logs"
+              name="Logs de Virtuagym"
+              parent="sale.menu_sale_config"
+              action="action_virtuagym_log"
+              sequence="101"/>
+
+</odoo>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_authorization_template">
+        <t t-call="web.html_container">
+            <t t-set="report_html_header">
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+            </t>
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <style>
+                        table {
+                           background-color: #ffffff !important;
+                        }
+                        tbody {
+                           background-color: #ffffff !important;
+                        }
+                        tr {
+                           background-color: #ffffff !important;
+                        }
+                        th {
+                           background-color: #ffffff !important;
+                        }
+                        .authorization-report table,
+                        .authorization-report tbody,
+                        .authorization-report tr,
+                        .authorization-report th,
+                        .authorization-report td {
+                            background-color: #ffffff !important;
+                        }
+                    </style>
+                    <t t-set="company" t-value="user.company_id" />
+                    <div class="page authorization-report"
+                        style="font-size: 12px; font-family: 'Helvetica'; color: black;">
+                        <h7 class="text-center mt-4" style="font-weight: bold;">AUTORIZACIÓN ORDEN
+                            DE CARGO PARA PAGO CON TARJETA DE CRÉDITO</h7>
+                        <br />
+                        <table id="tbl_1" name="tbl_1"
+                            style="width:100%; height:90px;border:solid 1px black; background-color: none;">
+                            <tr>
+                                <td style="text-align:center;">
+                                    <img
+                                        t-att-src="'/hfit/static/src/img/tarjetas.png'"
+                                        style="height:80px;" alt="Firma" />
+                                </td>
+                            </tr>
+                        </table>
+                        <br />
+                        <table id="tbl_2" name="tbl_2" style="width:100%; border:solid 1px black;">
+                            <tr>
+                                <td colspan="2">
+                                    <div class="row mt-4">
+                                        <div class="col-6">
+                                            <p><strong>Ciudad:</strong> Quito</p>
+                                        </div>
+                                        <div class="col-6 text-right">
+                                            <p>
+                                                <strong>Fecha:</strong>
+                                                <span
+                                                    t-esc="doc.date_order.strftime('%d/%m/%Y')" />
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p class="mt-3"> Señores<br />
+                            <strong>DINERS CLUB DEL ECUADOR
+                                        S.A./BANCO
+                                            PICHINCHA C.A.</strong><br /> Ciudad. </p>
+
+                                    <p class="mt-4" style="line-height: 1.8;"> Yo <strong
+                                            t-esc="doc.cc_cardholdername" />, por medio de la
+                                        presente, solicito a usted ordenar a quien corresponda, se
+                                        cargue a mi Tarjeta de Crédito <strong
+                                            t-esc="doc.cc_number_stored or '________________'" /> con
+                                        caducidad el <strong
+                                            t-esc="doc.expiration_date.strftime('%%m/%Y') or '__/____'" />
+                                        el valor de <strong>USD <t
+                                                t-esc="'%.2f' % doc.amount_total" /></strong>
+                                        por el siguiente concepto: Gimnasio HFIT. </p>
+
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Frecuencia de Pago:</strong> MENSUAL </td>
+                                <td>
+
+                                    <strong>Cliente HFIT:</strong>
+                                    <span t-field="doc.partner_id.name" />
+
+                                </td>
+                            </tr>
+                        </table>
+                        <t t-set="ph3600_encontrado" t-value="any(line.product_id.default_code == 'ph3600' for line in doc.order_line)" />
+                        <t t-set="meses_a_mostrar" t-value="12 if ph3600_encontrado else 3" />
+
+                        <div class="mt-4" style="font-size: 12px; text-align: justify;">
+                            <p>Debo y pagaré incondicionalmente sin protesto al Emisor de la tarjeta
+                                de crédito el total de los valores expresados en esta Autorización
+                                de Orden de Cargo, en el lugar y fecha que se convenga.</p>
+                            <p>En caso de mora pagaré la tasa máxima autorizada para el emisor de la
+                                tarjeta de crédito y los cargos que esta institución establezca por
+                                gestiones de la cartera vencida.</p>
+                            <p>Eximo al emisor de la tarjeta de crédito, de cualquier
+                                responsabilidad por los valores reportados por Juan Pablo Navas
+                                Olalla (HFIT Boxing Club). Por lo cual desde ya renuncio a cualquier
+                                reclamación y a iniciar cualquier acción legal en contra de las
+                                indicadas Instituciones, las mismas que no requerirán de otro
+                                instrumento o documento para procesar en mi tarjeta de crédito, los
+                                valores generados , los mismos que desde ya los acepto y reconozco
+                                como obligación.</p>
+                            <p>Me comprometo expresamente a enviar una comunicación escrita con 15
+                                días de anticipación, a la oficina Matriz del Emisor, en caso de
+                                revocación de la presente autorización, de lo contrario se entenderá
+                                vigente la orden de cargo expresada por los servicios antes
+                                determinados.</p>
+                            <p>Además, se establece que la duración mínima para este contrato es de
+                                <span t-esc="meses_a_mostrar"/> meses, en caso de no reportar la baja del servicio, este
+                                continuará indefinidamente.</p>
+                            <p>De igual manera autorizo que en caso de pérdida, hurto, robo o
+                                cualquier circunstancia por el que fuera cambiado el número de la
+                                tarjeta de crédito antes singularizada, se cuenta con el nuevo
+                                número que se me asigne para efectuar todos los pagos de manera
+                                incondicional dentro del período correspondiente, de tal manera que
+                                el cambio del número indicado no sea causa para no cancelar los
+                                valores que adeude.</p>
+                        </div>
+                        <br />
+                        <br />
+                        <table id="tbl_3" name="tbl_3"
+                            style="width:100%; height:100px; border:none; ">
+                            <tr>
+                                <td style="width: 30%; text-align: center;vertical-align: bottom;">
+                                    <br /> -------------------------------<br />
+                                    <strong>Firma del
+                                    Socio</strong>
+                                </td>
+                                <td style="width: 30%; text-align: center;vertical-align: bottom;">
+                                    <br />
+                                    <strong>C.I.</strong>
+                                    <span t-field="doc.partner_id.vat" />
+                                </td>
+                                <td style="width: 30%; text-align: center;vertical-align: bottom;">
+                                    <br />
+                                    <strong>Telf:</strong>
+                                    <span t-field="doc.partner_id.mobile" />
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="mt-4" style="font-size: 10px;">
+                            <p>HFIT Boxing Club certifica que la firma del socio es auténtica, por
+                                lo que cualquier reclamación en este sentido será debitado de la
+                                facturación de la empresa.</p>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sale_order_form_view_faceid" model="ir.ui.view">
+        <field name="name">sale.order.form.faceid</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="sync_faceid" type="object" string="sync faceId"/>
+                <button name="action_faceid_retry_sync" type="object" string="Reintentar FaceID"
+                        class="oe_highlight" invisible="faceid_sync_state not in ('pending', 'error')"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="faceid_sync" string="Sincronización FaceID">
+                    <group>
+                        <group>
+                            <field name="faceid_sync_state" widget="badge" 
+                                   decoration-info="faceid_sync_state == 'pending'"
+                                   decoration-success="faceid_sync_state == 'active'"
+                                   decoration-warning="faceid_sync_state == 'blocked'"
+                                   decoration-danger="faceid_sync_state == 'error'"/>
+                            <field name="faceid_last_sync"/>
+                        </group>
+                        <group>
+                            <field name="faceid_last_error" 
+                                   invisible="faceid_sync_state != 'error'"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

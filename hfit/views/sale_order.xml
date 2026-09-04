@@ -1,0 +1,91 @@
+<odoo>
+    <record id="hfit_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <!-- Agregar el campo en la vista del formulario -->
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="string">Socio</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_shipping_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="branch_id" required="1" />
+                <field name="start_date" required="1" string="Fecha de Inicio" />                
+                <field name="cc_cardholdername" required="0" />
+                <field name="cc_number_display" readonly="1" />
+                <field name="cc_number_input" placeholder="•••• •••• •••• ••••" />
+                <field name="cc_brand_id" required="0" />
+                <field name="expiration_date" required="0" />
+                <field name="cc_group_id" required="0" />                
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="referencia_pago" />
+                <field name="l10n_ec_sri_payment_id" />
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_sync_virtuagym" type="object" string="sync virtuagym" />
+
+                <button name="action_open_pause_wizard" type="object" string="Pausar Membresía"
+                    class="btn-primary"/>
+
+            </xpath>
+            <xpath expr="//header/button[@name='action_sync_virtuagym']" position="attributes">
+                <attribute name="invisible">False</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_invoice_id']" position="attributes">
+                <attribute name="domain">[('vat', '!=', False)]</attribute>
+                <attribute name="context">{'show_vat': True}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='order_details']//field[@name='date_order']" position="after">
+                <field name="subscription_state" readonly="1" />
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_quotation_send']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_preview_sale_order']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='prepare_upsell_order']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Historial de Tarjeta" groups="base.group_system">
+                    <field name="cc_history_ids" readonly="1">
+                        <list>
+                            <field name="change_date" />
+                            <field name="user_id" />
+                            <field name="new_value_masked" />
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="action_report_hfit_authorization_so" model="ir.actions.report">
+        <field name="name">Autorización de Cargo SO</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hfit.report_authorization_template</field>
+        <field name="report_file">hfit.report_authorization_template</field>
+        <field name="binding_model_id" ref="model_sale_order" />
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Autorizacion Cargo - %s' % (object.partner_id.name)</field>
+    </record>
+    <record id="hfit_order_tree_inherit" model="ir.ui.view">
+        <field name="name">sale.order.tree.inherit.socio</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="string">Socio</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

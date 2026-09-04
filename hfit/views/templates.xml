@@ -1,0 +1,277 @@
+<odoo>
+    <template id="customer_lookup_page" name="Customer Lookup">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+
+                <div class="container">
+                    <h1>Buscar Cliente por Cédula</h1>
+                    <form action="/customer_details" method="POST" class="form-horizontal">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                        <div class="form-group">
+                            <label class="col-md-3 col-sm-4 control-label" for="vat_number">
+                                Cédula/RUC</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="text" class="form-control" name="vat_number"
+                                    required="required" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-7 col-sm-offset-4 col-sm-8">
+                                <button type="submit" class="btn btn-primary">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="customer_form_page" name="Customer Details">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container">
+                    <h1 t-if="partner">Editar Cliente: <t t-esc="partner.name" /></h1>
+                    <h1 t-else="">Crear Nuevo Cliente</h1>
+
+                    <t t-if="message">
+                        <div class="alert alert-info" role="alert">
+                            <t t-esc="message" />
+                        </div>
+                    </t>
+                    <t t-if="error_vat">
+                        <div class="alert alert-danger" role="alert">
+                            <t t-esc="error_vat" />
+                        </div>
+                    </t>
+                    <t t-if="errors">
+                        <div class="alert alert-danger" role="alert">
+                            <p>Por favor, corrija los siguientes errores:</p>
+                            <ul>
+                                <li t-foreach="errors.items()" t-as="err">
+                                    <t t-esc="err[1]" />
+                                </li>
+                            </ul>
+                        </div>
+                    </t>
+
+                    <form action="/customer_save" method="POST" class="form-horizontal"
+                        id="customer_data_form_member" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                        <input type="hidden" name="partner_id" t-if="partner"
+                            t-att-value="partner.id" />
+
+                        <h2>Datos del Socio HFIT</h2>
+                        <p>Todos los campos marcados con * son obligatorios.</p>
+
+                        <div class="form-group">
+                            <label for="profile_photo">Upload Profile Photo</label>
+                            <input type="file" name="profile_photo" id="profile_photo_input"
+                                class="form-control" accept="image/*" onchange="previewImage(event)" />
+
+                            <!-- Display the current profile photo -->
+                            <t t-if="profile_photo">
+                                <div class="mt-2">
+                                    <img id="profile_photo_preview" t-att-src="profile_photo"
+                                        alt="Profile Photo" class="img-thumbnail"
+                                        style="max-width: 150px;" />
+                                </div>
+                            </t>
+
+                            <!-- New Preview (for selected file) -->
+                            <div class="mt-2">
+                                <img id="new_profile_photo_preview" class="img-thumbnail"
+                                    style="max-width: 150px; display: none;" />
+                            </div>
+                        </div>
+                        <div
+                            t-attf-class="form-group #{'has-error' if errors and 'branch' in errors else ''}">
+                            <div class="col-md-7 col-sm-8">
+                                <label for="company_id">Sucursal</label>
+                                <select name="company_id" required="required"
+                                    t-attf-class="py-2 px-3 #{'form-control' if len(branches) == 1 else 'form-select'}">
+                                    <option value="" disabled="disabled" selected="selected">Seleccione
+                                        una sucursal</option>
+                                    <t t-set="default_branch_id_if_partner_empty" t-value="1" />
+                                    <t t-foreach="branches" t-as="company">
+                                        <option t-att-value="company.id"
+                                            t-att-selected="(partner and company.id == partner.member_branch_id.id) or (not partner and company.id == default_branch_id_if_partner_empty) and 'selected'">
+                                            <t t-esc="company.name" />
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div
+                            t-attf-class="form-group #{'has-error' if errors and 'vat' in errors else ''}">
+                            <label class="col-md-3 col-sm-4 control-label" for="vat">Cédula*</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="text" class="form-control" name="vat"
+                                    required="false"
+                                    t-att-readonly="'readonly' if partner and partner.member_id else None"
+                                    readonly="readonly"
+                                    t-att-value="partner.vat if partner else (submitted_values.get('vat') if submitted_values else vat_new)" />
+                                <div t-if="errors and 'vat' in errors" class="text-danger">
+                                    <t t-esc="errors['vat']" />
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            t-attf-class="form-group #{'has-error' if errors and 'firstname' in errors else ''}">
+                            <label class="col-md-3 col-sm-4 control-label" for="firstname">Nombres
+                                Completo *</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="text" class="form-control" name="firstname"
+                                    required="required"
+                                    t-att-value="partner.firstname if partner else (submitted_values.get('firstname') if submitted_values else '')" />
+                                <div t-if="errors and 'name' in errors" class="text-danger">
+                                    <t t-esc="errors['firstname']" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            t-attf-class="form-group #{'has-error' if errors and 'lastname' in errors else ''}">
+                            <label class="col-md-3 col-sm-4 control-label" for="lastname">Apellidos
+                                Completo *</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="text" class="form-control" name="lastname"
+                                    required="required"
+                                    t-att-value="partner.lastname if partner else (submitted_values.get('lastname') if submitted_values else '')" />
+                                <div t-if="errors and 'lastname' in errors" class="text-danger">
+                                    <t t-esc="errors['lastname']" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            t-attf-class="form-group #{'has-error' if errors and 'email' in errors else ''}">
+                            <label class="col-md-3 col-sm-4 control-label" for="email">Correo
+                                Electrónico *</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="email" class="form-control" name="email"
+                                    required="false"
+                                    t-att-readonly="'readonly' if partner else None"
+                                    t-att-value="partner.email if partner else  (submitted_values.get('email') if submitted_values else '')" />
+                                <div t-if="errors and 'email' in errors" class="text-danger">
+                                    <t t-esc="errors['email']" />
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            t-attf-class="form-group #{'has-error' if errors and 'mobile' in errors else ''}">
+                            <label class="col-md-3 col-sm-4 control-label" for="mobile">Celular *</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="tel" class="form-control" name="mobile"
+                                    required="required"
+                                    t-att-value="partner.mobile if partner else  (submitted_values.get('mobile') if submitted_values else '')" />
+                                <div t-if="errors and 'mobile' in errors" class="text-danger">
+                                    <t t-esc="errors['mobile']" />
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            t-attf-class="form-group #{'has-error' if errors and 'contact_street' in errors else ''}">
+                            <label class="col-md-3 col-sm-4 control-label" for="contact_street">Dirección
+                                *</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="text" class="form-control" name="contact_street"
+                                    required="required"
+                                    t-att-value="partner.street if partner else  (submitted_values.get('street') if submitted_values else '')" />
+                            </div>
+                        </div>
+
+                        <div
+                            t-attf-class="form-group #{'has-error' if errors and 'contact_gender' in errors else ''}">
+                            <label class="col-md-3 col-sm-4 control-label" for="contact_gender">Genero
+                                *</label>
+                            <div class="col-md-7 col-sm-8">
+                                <select name="gender" required="required"
+                                    t-attf-class="form-control">
+                                    <option value="m"
+                                        t-att-selected="partner.gender == 'm' and 'selected' if partner else ''">
+                                        Masculino</option>
+                                    <option value="f"
+                                        t-att-selected="partner.gender == 'f' and 'selected' if partner else ''">
+                                        Femenino</option>
+                                    <option value="o"
+                                        t-att-selected="partner.gender == 'o' and 'selected' if partner else ''">
+                                        No especificado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div
+                            t-attf-class="form-group #{'has-error' if errors and 'contact_birthday' in errors else ''}">
+                            <label class="col-md-3 col-sm-4 control-label" for="contact_birthday">Fecha
+                                de
+                                Nacimiento
+                                *</label>
+                            <div class="col-md-7 col-sm-8">
+                                <input type="date" class="form-control" name="birthday"
+                                    t-att-value="partner.birthday  or '' if partner else ''"
+                                    required="required" />
+
+                            </div>
+                        </div>
+                        <div>
+                            <br></br>
+                            <p>
+                                <b>Terminos y Condiciones:</b>
+                                <ul>1. Me comprometo a usar ropa
+                                adecuada para la actividad a realizar con esto evitar lesiones.</ul>
+                                <ul>2. Me comprometo a dejar todos los implementos en su lugar despues
+                                de usarlos.
+                                </ul>
+                                <ul> 3. Me comprometo a traer una toalla de uso personal por
+                                higiene y preservacion de los implementos usados. </ul>
+                                <ul>4. No me es
+                                permitido fumar o ingresar bebidas alcoholicas al gimnasio. </ul>
+                                <ul>5. A
+                                partir de la inscripción en HFIT Gym renuncio a reclamos o cualquier
+                                tipo de indemnizacion por accidentes o derivados por uso inadecuado
+                                de las instalaciones del gimnasio. </ul> <ul> 6. Autorizo a HFIT Gym el uso de
+                                mi imagen tomada dentro de las instalaciones para uso publicitario.</ul> </p>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-7 col-sm-offset-4 col-sm-8">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="is_agree_terms"
+                                            id="is_agree_terms"
+                                            t-att-checked="'checked' if is_agree_terms else (submitted_values.get('is_agree_terms') == 'on' if submitted_values else None)" />
+                                        Estoy de Acuerdo </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-md-offset-3 col-md-7 col-sm-offset-4 col-sm-8">
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                <a href="/customer_lookup" class="btn btn-default">Cancelar</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="customer_form_success_page" name="Customer Saved">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container">
+                    <h1>¡Cliente Guardado!</h1>
+                    <p>Los datos del cliente <t t-esc="partner.name" /> (<t t-esc="partner.vat" />)
+                        han sido guardados correctamente.</p>
+                    <p>
+                        <a t-attf-href="/customer_details?partner_id=#{partner.id}"
+                            class="btn btn-info">Ver/Editar Nuevamente</a>
+                        <a href="/customer_lookup" class="btn btn-primary">Buscar Otro Cliente</a>
+                    </p>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

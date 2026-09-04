@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_odoo_face_attendance_odoo_face_attendance,odoo_face_attendance.odoo_face_attendance,model_odoo_face_attendance_odoo_face_attendance,base.group_user,1,1,1,1
