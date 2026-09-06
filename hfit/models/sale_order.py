@@ -271,32 +271,35 @@ class SaleOrder(models.Model):
                 return membership_id
         return False
 
+    # Valores aceptados por la API de Virtuagym en el campo payment_method.
+    # Confirmados por la propia API, que rechaza cualquier otro con:
+    #   "Field 'payment_method' must be one of: cash, bank_transfer, card_terminal, not_paid"
+    # OJO: 'card' NO es válido; enviarlo hace que la creación de la membresía falle.
+    VIRTUAGYM_PAYMENT_METHODS = ('cash', 'bank_transfer', 'card_terminal', 'not_paid')
+
     # Mapeo explícito forma de pago SRI -> payment_method de Virtuagym.
     # Códigos según el catálogo de l10n_ec (l10n_ec.sri.payment):
-    #   01 No use of the financial system (efectivo)  -> cash
-    #   16 Debit Card                                 -> card
-    #   19 Credit Card                                -> card
-    #   15 Offset of Debts / 20 Others with use of the financial system (transferencia):
-    #      no están mapeados a propósito, ver VIRTUAGYM_PAYMENT_METHOD_FALLBACK.
+    #   01 No use of the financial system (efectivo)          -> cash
+    #   15 Offset of Debts (compensación, no hubo cobro real) -> not_paid
+    #   16 Debit Card                                         -> card_terminal
+    #   19 Credit Card                                        -> card_terminal
+    #   20 Others with use of the financial system (transf.)  -> bank_transfer
     VIRTUAGYM_PAYMENT_METHOD_BY_SRI_CODE = {
         '01': 'cash',
-        '16': 'card',
-        '19': 'card',
+        '15': 'not_paid',
+        '16': 'card_terminal',
+        '19': 'card_terminal',
+        '20': 'bank_transfer',
     }
-    # Valor usado cuando la forma de pago no está mapeada o no está informada.
-    # Mantiene el comportamiento anterior ('card') para no cambiar lo que ya se
-    # venía enviando, pero cada uso queda registrado como warning para poder
-    # detectar los casos reales y decidir el valor correcto.
-    VIRTUAGYM_PAYMENT_METHOD_FALLBACK = 'card'
+    # Valor usado cuando la orden no tiene forma de pago SRI informada o trae un
+    # código fuera del catálogo esperado. Se asume 'cash' porque la venta ya está
+    # confirmada (hubo cobro) y marcarla 'not_paid' podría afectar el estado del
+    # socio en Virtuagym. Cada uso queda registrado como warning.
+    VIRTUAGYM_PAYMENT_METHOD_FALLBACK = 'cash'
 
     def _get_virtuagym_payment_method(self):
         """Traduce la forma de pago SRI de la orden al payment_method que espera
-        la API de Virtuagym.
-
-        Nota: los valores aceptados por Virtuagym no están documentados públicamente
-        (su repo de documentación es privado). 'cash' y 'card' son los que se vienen
-        usando; verificar el resultado real en los logs de Virtuagym (virtuagym.log,
-        acción 'Crear Membresía') antes de dar por bueno un valor nuevo.
+        la API de Virtuagym (ver VIRTUAGYM_PAYMENT_METHODS para los valores válidos).
         """
         self.ensure_one()
         code = self.l10n_ec_sri_payment_id.code
