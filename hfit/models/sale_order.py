@@ -271,14 +271,55 @@ class SaleOrder(models.Model):
                 return membership_id
         return False
 
+    # Mapeo explícito forma de pago SRI -> payment_method de Virtuagym.
+    # Códigos según el catálogo de l10n_ec (l10n_ec.sri.payment):
+    #   01 No use of the financial system (efectivo)  -> cash
+    #   16 Debit Card                                 -> card
+    #   19 Credit Card                                -> card
+    #   15 Offset of Debts / 20 Others with use of the financial system (transferencia):
+    #      no están mapeados a propósito, ver VIRTUAGYM_PAYMENT_METHOD_FALLBACK.
+    VIRTUAGYM_PAYMENT_METHOD_BY_SRI_CODE = {
+        '01': 'cash',
+        '16': 'card',
+        '19': 'card',
+    }
+    # Valor usado cuando la forma de pago no está mapeada o no está informada.
+    # Mantiene el comportamiento anterior ('card') para no cambiar lo que ya se
+    # venía enviando, pero cada uso queda registrado como warning para poder
+    # detectar los casos reales y decidir el valor correcto.
+    VIRTUAGYM_PAYMENT_METHOD_FALLBACK = 'card'
+
     def _get_virtuagym_payment_method(self):
         """Traduce la forma de pago SRI de la orden al payment_method que espera
-        Virtuagym ('cash', 'card', etc.). Código '01' (No use of financial system) es efectivo,
-        el resto de códigos implican uso del sistema financiero (tarjeta)."""
+        la API de Virtuagym.
+
+        Nota: los valores aceptados por Virtuagym no están documentados públicamente
+        (su repo de documentación es privado). 'cash' y 'card' son los que se vienen
+        usando; verificar el resultado real en los logs de Virtuagym (virtuagym.log,
+        acción 'Crear Membresía') antes de dar por bueno un valor nuevo.
+        """
         self.ensure_one()
-        if self.l10n_ec_sri_payment_id.code == '01':
-            return 'cash'
-        return 'card'
+        code = self.l10n_ec_sri_payment_id.code
+
+        if not code:
+            _logger.warning(
+                "_get_virtuagym_payment_method: la orden %s no tiene forma de pago SRI "
+                "informada; se envía '%s' a Virtuagym por defecto.",
+                self.name, self.VIRTUAGYM_PAYMENT_METHOD_FALLBACK,
+            )
+            return self.VIRTUAGYM_PAYMENT_METHOD_FALLBACK
+
+        payment_method = self.VIRTUAGYM_PAYMENT_METHOD_BY_SRI_CODE.get(code)
+        if not payment_method:
+            _logger.warning(
+                "_get_virtuagym_payment_method: forma de pago SRI %s (%s) sin mapeo a "
+                "Virtuagym en la orden %s; se envía '%s'.",
+                code, self.l10n_ec_sri_payment_id.name, self.name,
+                self.VIRTUAGYM_PAYMENT_METHOD_FALLBACK,
+            )
+            return self.VIRTUAGYM_PAYMENT_METHOD_FALLBACK
+
+        return payment_method
 
     def sync_virtuagym_membership(self):
         """Crea en Virtuagym la membership instance (contrato) correspondiente al
