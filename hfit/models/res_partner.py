@@ -144,7 +144,9 @@ class ResPartner(models.Model):
             vals['lastname'] = self.lastname
             vals['gender'] = self.gender
             vals['birthday'] = self.birthday
-            vals['mobile'] = self.mobile
+            # La clave 'mobile' es la que espera la API de Virtuagym; en Odoo 19
+            # res.partner.mobile ya no existe y el número vive en 'phone'.
+            vals['mobile'] = self.phone
             vals['street'] = self.street or ''
 
             vals['member_id'] = member_data.get('member_id')
@@ -177,8 +179,9 @@ class ResPartner(models.Model):
             vals['lastname'] = partner.lastname
             vals['gender'] = partner.gender
             vals['birthday'] = partner.birthday
-            vals['mobile'] = partner.mobile
-            vals['street'] = partner.street or ''            
+            # 'mobile' = clave de la API de Virtuagym; el dato sale de partner.phone (v19)
+            vals['mobile'] = partner.phone
+            vals['street'] = partner.street or ''
         
       
         body = {
@@ -328,7 +331,8 @@ class ResPartner(models.Model):
                 'lastname': member_data.get('lastname'),
                 'email': member_data.get('email'),
                 'member_id': member_data.get('member_id'),
-                'mobile': member_data.get('mobile'),
+                # Virtuagym devuelve 'mobile'; en Odoo 19 se guarda en 'phone'
+                'phone': member_data.get('mobile'),
                 'vat': member_data.get('club_member_id'),
                 'birthday': member_data.get('birthday'),
                 'gender': member_data.get('gender'),         

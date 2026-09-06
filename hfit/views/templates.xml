@@ -159,14 +159,14 @@
                             </div>
                         </div>
                         <div
-                            t-attf-class="form-group #{'has-error' if errors and 'mobile' in errors else ''}">
-                            <label class="col-md-3 col-sm-4 control-label" for="mobile">Celular *</label>
+                            t-attf-class="form-group #{'has-error' if errors and 'phone' in errors else ''}">
+                            <label class="col-md-3 col-sm-4 control-label" for="phone">Celular *</label>
                             <div class="col-md-7 col-sm-8">
-                                <input type="tel" class="form-control" name="mobile"
+                                <input type="tel" class="form-control" name="phone"
                                     required="required"
-                                    t-att-value="partner.mobile if partner else  (submitted_values.get('mobile') if submitted_values else '')" />
-                                <div t-if="errors and 'mobile' in errors" class="text-danger">
-                                    <t t-esc="errors['mobile']" />
+                                    t-att-value="partner.phone if partner else  (submitted_values.get('phone') if submitted_values else '')" />
+                                <div t-if="errors and 'phone' in errors" class="text-danger">
+                                    <t t-esc="errors['phone']" />
                                 </div>
                             </div>
                         </div>

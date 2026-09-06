@@ -60,7 +60,7 @@ class WebsiteCustomer(http.Controller):
 
         branches = request.env['res.branch'].sudo().search([])
 
-        required_fields_contact = ['lastname', 'email', 'vat', 'mobile', 'contact_street','company_id']
+        required_fields_contact = ['lastname', 'email', 'vat', 'phone', 'contact_street','company_id']
         errors = {}
         for field in required_fields_contact:
             if not post.get(field):
@@ -98,7 +98,7 @@ class WebsiteCustomer(http.Controller):
             'lastname': post.get('lastname'),
             'vat': post.get('vat'),
             'email': post.get('email'),
-            'mobile': post.get('mobile'),
+            'phone': post.get('phone'),
             'street': post.get('contact_street'),
             'city': 'Quito',
             'country_id': 63,
@@ -152,7 +152,7 @@ class WebsiteCustomer(http.Controller):
                 'street': post.get('invoice_street'),                
                 'type': 'invoice',
                 'email': post.get('invoice_email', partner.email),
-                'mobile': post.get('invoice_mobile', partner.mobile), 
+                'phone': post.get('invoice_phone', partner.phone),
                 'member_branch_id' : post.get('company_id'),
                 'city': 'Quito',
                 'country_id': 63}

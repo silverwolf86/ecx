@@ -142,7 +142,7 @@
                                 <td style="width: 30%; text-align: center;vertical-align: bottom;">
                                     <br />
                                     <strong>Telf:</strong>
-                                    <span t-field="doc.partner_id.mobile" />
+                                    <span t-field="doc.partner_id.phone" />
                                 </td>
                             </tr>
                         </table>

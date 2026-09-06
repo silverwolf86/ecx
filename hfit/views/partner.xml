@@ -14,9 +14,6 @@
             <field name="function" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
-            <field name="phone" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </field>
             <field name="website" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
@@ -26,9 +23,13 @@
             <field name="category_id" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
-            <!-- Datos del socio, agrupados justo debajo de la cédula/RUC para que
-                 todo el bloque de identificación quede contiguo en una sola columna. -->
-            <field name="vat" position="after">
+            <!-- Datos del socio. Se anclan en category_id (último hijo directo del
+                 <group>) y NO en vat: base_vat mueve el campo vat dentro de un
+                 <div name="vat_vies_container">, y los campos insertados dentro de
+                 ese div se renderizan en línea y sin label. Como function, website,
+                 lang y category_id quedan ocultos arriba, estos campos aparecen
+                 igualmente contiguos debajo de la cédula/RUC. -->
+            <field name="category_id" position="after">
                 <field name="gender" string="Género" />
                 <field name="birthday" string="Fecha de nacimiento" />
                 <field name="member_id" string="ID de Socio Virtuagym" />
