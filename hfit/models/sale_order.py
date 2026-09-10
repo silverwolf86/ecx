@@ -160,8 +160,8 @@ class SaleOrder(models.Model):
         return super().action_cancel()
 
     def action_confirm(self):
+        res = super(SaleOrder, self).action_confirm()
         for order in self:
-            res = super(SaleOrder, self).action_confirm()
 
             #validar si el plan es de 3600 debe haber tomado otro plan anterior debe pedir confirmacion del usuario de si o no
             #
@@ -170,7 +170,7 @@ class SaleOrder(models.Model):
             order._validate_cc_number(order.cc_number_stored or order.cc_number)
 
             # Validar que el mismo socio no tenga otra sale.order activa (suscripción)
-            if self.plan_id:
+            if order.plan_id:
                 # si es recurrente ahi los campos de tarjeta son obligatorios
                 if order.branch_id.id != 1:
                     if not order.cc_number_display or not order.cc_cardholdername or not order.expiration_date:
