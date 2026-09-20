@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="inbox_document.ListView.Buttons">
+        <button type="button"
+                class="btn btn-secondary o_button_load_file_sri"
+                t-on-click="actionAbrirWizardSRI">
+            Cargar Archivo SRI
+        </button>
+    </t>
+</templates>

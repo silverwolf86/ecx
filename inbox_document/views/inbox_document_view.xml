@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="inbox_document_view_form" model="ir.ui.view">
+        <field name="name">inbox.document.view.form</field>
+        <field name="model">inbox.document</field>
+        <field name="arch" type="xml">
+            <form string="Documento de Entrada">
+                <header>
+                    <button name="reprocesar_xml" type="object" string="Reprocesar XML"
+                            class="oe_highlight"/>
+                    <button name="create_invoice" type="object" string="Crear Documento"
+                            class="oe_highlight"
+                            invisible="estado == 'procesado' or not line_ids"/>
+                    <field name="estado" widget="statusbar"
+                           statusbar_visible="cargado,consultado,procesado"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="numero_comprobante" placeholder="000-000-000000000"/></h1>
+                    </div>
+                    <group>
+                        <group string="Comprobante">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="tipo_documento"/>
+                            <field name="clave_acceso"/>
+                            <field name="numero_autorizacion"/>
+                            <field name="fecha_autorizacion"/>
+                            <field name="fecha_emision"/>
+                        </group>
+                        <group string="Emisor">
+                            <field name="partner_id"/>
+                            <field name="partner_name"/>
+                            <field name="ruc_emisor"/>
+                            <field name="total"/>
+                            <field name="agrupar"/>
+                            <field name="invoice_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Líneas" name="lines">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id" optional="show"/>
+                                    <field name="product_code" optional="show"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="price_unit"/>
+                                    <field name="discount_amount"/>
+                                    <field name="discount" optional="hide"/>
+                                    <field name="tax_ids" widget="many2many_tags"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Información Adicional" name="info_adicional">
+                            <field name="info_adicional"/>
+                        </page>
+                        <page string="XML Recibido" name="xml">
+                            <field name="xml_recibido"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="inbox_document_view_tree" model="ir.ui.view">
+        <field name="name">inbox.document.view.list</field>
+        <field name="model">inbox.document</field>
+        <field name="arch" type="xml">
+            <list
+                string="Documentos de Entrada"
+                js_class="inbox_document_list"
+                decoration-info="estado == 'consultado'"
+                decoration-success="estado == 'procesado'"
+                decoration-danger="estado == 'error'">
+                <field name="fecha_emision"/>
+                <field name="numero_comprobante"/>
+                <field name="tipo_documento"/>
+                <field name="partner_id"/>
+                <field name="ruc_emisor" optional="show"/>
+                <field name="clave_acceso" optional="hide"/>
+                <field name="numero_autorizacion" optional="hide"/>
+                <field name="fecha_autorizacion" optional="hide"/>
+                <field name="total" sum="Total"/>
+                <field name="invoice_id" optional="show"/>
+                <field name="estado" widget="badge"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+<!-- 
+    <record id="inbox_document_view_search" model="ir.ui.view">
+        <field name="name">inbox.document.view.search</field>
+        <field name="model">inbox.document</field>
+        <field name="arch" type="xml">
+            <search string="Documentos de Entrada">
+                <field name="numero_comprobante"/>
+                <field name="clave_acceso"/>
+                <field name="partner_id"/>
+                <field name="ruc_emisor"/>
+                <filter name="filter_consultado" string="Consultados"
+                        domain="[('estado', '=', 'consultado')]"/>
+                <filter name="filter_procesado" string="Procesados"
+                        domain="[('estado', '=', 'procesado')]"/>
+                <filter name="filter_error" string="Con Error"
+                        domain="[('estado', '=', 'error')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_partner" string="Proveedor"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_estado" string="Estado"
+                            context="{'group_by': 'estado'}"/>
+                    <filter name="group_tipo" string="Tipo Documento"
+                            context="{'group_by': 'tipo_documento'}"/>
+                    <filter name="group_fecha" string="Fecha Emisión"
+                            context="{'group_by': 'fecha_emision'}"/>
+                </group>
+            </search>
+        </field>
+    </record> -->
+
+    <record id="inbox_document_action" model="ir.actions.act_window">
+        <field name="name">Documentos de Entrada</field>
+        <field name="res_model">inbox.document</field>
+        <field name="view_mode">list,form</field>
+        <!-- <field name="search_view_id" ref="inbox_document_view_search"/> -->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No existen registros para mostrar
+            </p><p>
+                Cargue un archivo de claves de acceso del SRI.
+            </p>
+        </field>
+    </record>
+
+    <record id="inbox_document_action_reprocess" model="ir.actions.server">
+        <field name="name">Reprocesar XML</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="inbox_document.model_inbox_document"/>
+        <field name="binding_model_id" ref="inbox_document.model_inbox_document"/>
+        <field name="code">
+if records:
+    records.reprocesar_xml()
+        </field>
+    </record>
+
+    <record id="inbox_document_action_create_invoice" model="ir.actions.server">
+        <field name="name">Crear documentos</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="inbox_document.model_inbox_document"/>
+        <field name="binding_model_id" ref="inbox_document.model_inbox_document"/>
+        <field name="code">
+if records:
+    records.create_invoice()
+        </field>
+    </record>
+</odoo>

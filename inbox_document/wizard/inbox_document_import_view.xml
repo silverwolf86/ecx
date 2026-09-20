@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="inbox_document_import_form" model="ir.ui.view">
+        <field name="name">inbox.document.import.form</field>
+        <field name="model">inbox.document.import</field>
+        <field name="arch" type="xml">
+            <form string="Cargar Archivo SRI">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" invisible="1"/>
+                            <field name="txt" widget="binary" filename="name"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="agrupar"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="importar_archivo_txt" class="oe_highlight" type="object"
+                            string="Procesar"/>
+                    <button string="Cancelar" special="cancel" data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

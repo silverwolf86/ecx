@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_inbox_document_all,inbox.document all,model_inbox_document,,1,0,0,0
+access_inbox_document_invoice,inbox.document invoice,model_inbox_document,account.group_account_invoice,1,1,1,0
+access_inbox_document_manager,inbox.document manager,model_inbox_document,account.group_account_manager,1,1,1,1
+access_inbox_document_line_all,inbox.document.xml.detail all,model_inbox_document_xml_detail,,1,0,0,0
+access_inbox_document_line_invoice,inbox.document.xml.detail invoice,model_inbox_document_xml_detail,account.group_account_invoice,1,1,1,1
+access_inbox_document_line_manager,inbox.document.xml.detail manager,model_inbox_document_xml_detail,account.group_account_manager,1,1,1,1
+access_inbox_document_import_invoice,inbox.document.import invoice,model_inbox_document_import,account.group_account_invoice,1,1,1,1
+access_inbox_document_import_manager,inbox.document.import manager,model_inbox_document_import,account.group_account_manager,1,1,1,1

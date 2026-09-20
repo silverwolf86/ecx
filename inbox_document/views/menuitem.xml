@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <menuitem id="documento_electronico_menu_act" name="Documentos Electrónicos"
+              parent="account.menu_finance_payables" sequence="300">
+        <menuitem id="inbox_document_menu_act" name="Documentos de Entrada"
+                  action="inbox_document.inbox_document_action"/>
+    </menuitem>
+</odoo>
