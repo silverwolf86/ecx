@@ -17,6 +17,7 @@ class AccountMove(models.Model):
         store=False,
     )
     autorizacion = fields.Char(string='Número de Autorización', copy=False)
+    inbox_requiere_revision = fields.Boolean(related='inbox_invoice_id.requiere_revision')
 
     @api.depends('partner_id', 'move_type')
     def _compute_inbox_invoice_id_domain(self):

@@ -2,15 +2,24 @@ import io
 import json
 import base64
 import uuid
-import pytz
+from datetime import datetime, time
 from urllib.parse import quote
+import pytz
 import numpy as np
 import face_recognition
+from markupsafe import escape
 from odoo import http, fields
 from odoo.http import request
 import logging
 
 _logger = logging.getLogger(__name__)
+
+
+def _parse_branch(value):
+    try:
+        return max(int(value or 0), 0)
+    except (ValueError, TypeError):
+        return 0
 
 
 class FaceAttendance(http.Controller):
@@ -19,8 +28,9 @@ class FaceAttendance(http.Controller):
     @http.route('/face_attendance', type='http', auth='public', csrf=False)
     def face_attendance(self, **kwargs):
         unique_req_id = str(uuid.uuid4())
-        branch = kwargs.get('branch', '')
-        branch_label = f' - Sucursal {branch}' if branch else ''
+        branch_id = _parse_branch(kwargs.get('branch'))
+        branch = branch_id or ''
+        branch_label = f' - Sucursal {branch_id}' if branch_id else ''
 
         return f"""<!DOCTYPE html>
     <html>
@@ -99,12 +109,9 @@ class FaceAttendance(http.Controller):
     @http.route('/submit_face', type='http', auth='public', csrf=False, methods=['POST'])
     def submit_face(self, **kwargs):
         data_url = kwargs.get('face_image')
-        branch_raw = kwargs.get('branch', '0')
-
-        try:
-            branch_id = int(branch_raw) if branch_raw else 0
-        except (ValueError, TypeError):
-            branch_id = 0
+        branch_id = _parse_branch(kwargs.get('branch'))
+        ip_address = request.httprequest.remote_addr
+        browser = request.httprequest.user_agent.browser
 
         if not data_url or not data_url.startswith('data:image'):
             return request.redirect('/face_attendance/result?status=error&msg=No se recibio imagen')
@@ -145,23 +152,37 @@ class FaceAttendance(http.Controller):
                             )
                             open_att.write({
                                 'check_out': now,
+                                'out_mode': 'kiosk',
+                                'out_ip_address': ip_address,
+                                'out_browser': browser,
                                 'close_reason': f'Cambio de sucursal: {open_branch} → {branch_id}',
                             })
                             Attendance.create({
                                 'employee_id': emp.id,
                                 'check_in': now,
+                                'in_mode': 'kiosk',
+                                'in_ip_address': ip_address,
+                                'in_browser': browser,
                                 'branch_id': branch_id,
                             })
                             status_txt = f"Entrada sucursal {branch_id} (sesión sucursal {open_branch} cerrada automáticamente)"
                         else:
                             # Misma sucursal → checkout normal
-                            open_att.write({'check_out': now})
+                            open_att.write({
+                                'check_out': now,
+                                'out_mode': 'kiosk',
+                                'out_ip_address': ip_address,
+                                'out_browser': browser,
+                            })
                             status_txt = f"Salida sucursal {branch_id}"
                     else:
                         # Sin sesión abierta → nuevo checkin
                         Attendance.create({
                             'employee_id': emp.id,
                             'check_in': now,
+                            'in_mode': 'kiosk',
+                            'in_ip_address': ip_address,
+                            'in_browser': browser,
                             'branch_id': branch_id,
                         })
                         status_txt = f"Entrada sucursal {branch_id}"
@@ -184,31 +205,30 @@ class FaceAttendance(http.Controller):
         status = kwargs.get('status', 'info')
         msg = kwargs.get('msg', 'Proceso finalizado')
         employee_id = kwargs.get('employee_id')
-        branch = kwargs.get('branch', '0')
+        branch = _parse_branch(kwargs.get('branch'))
 
         sessions = []
         if employee_id:
             try:
-                emp_id = int(employee_id)
+                emp = request.env['hr.employee'].sudo().browse(int(employee_id)).exists()
                 Attendance = request.env['hr.attendance'].sudo()
-                now = fields.Datetime.now()
-                today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-                today_end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+                local_tz = pytz.timezone(emp.tz or emp.company_id.resource_calendar_id.tz or 'UTC')
 
-                company_tz = pytz.timezone(
-                    request.env['res.users'].sudo().browse(2).tz or 'UTC'
-                )
+                # Rango del día en hora local, convertido a UTC (como se guarda en BD)
+                today_local = datetime.now(local_tz).date()
+                today_start = local_tz.localize(datetime.combine(today_local, time.min)).astimezone(pytz.utc).replace(tzinfo=None)
+                today_end = local_tz.localize(datetime.combine(today_local, time.max)).astimezone(pytz.utc).replace(tzinfo=None)
 
                 def to_local(dt):
                     if not dt:
                         return 'Abierto'
-                    return pytz.utc.localize(dt).astimezone(company_tz).strftime('%H:%M:%S')
+                    return pytz.utc.localize(dt).astimezone(local_tz).strftime('%H:%M:%S')
 
                 today_sessions = Attendance.search([
-                    ('employee_id', '=', emp_id),
+                    ('employee_id', '=', emp.id),
                     ('check_in', '>=', today_start),
                     ('check_in', '<=', today_end),
-                ], order='check_in asc')
+                ], order='check_in asc') if emp else Attendance
 
                 for att in today_sessions:
                     sessions.append({
@@ -222,7 +242,7 @@ class FaceAttendance(http.Controller):
 
         return self._render_result(msg, status, sessions, branch)
 
-    def _render_result(self, message, status, sessions=None, branch='0'):
+    def _render_result(self, message, status, sessions=None, branch=0):
         color = "#71639e"
         if status == 'success':
             color = "#28a745"
@@ -231,7 +251,7 @@ class FaceAttendance(http.Controller):
         if status == 'error':
             color = "#dc3545"
 
-        branch_link = f"/face_attendance?branch={branch}" if branch and branch != '0' else "/face_attendance"
+        branch_link = f"/face_attendance?branch={branch}" if branch else "/face_attendance"
 
         sessions_html = ""
         if sessions:
@@ -240,7 +260,7 @@ class FaceAttendance(http.Controller):
                 checkout_style = 'color:#28a745;font-weight:bold;' if s['check_out'] == 'Abierto' else ''
                 rows += f"""
                 <tr>
-                    <td>{s['employee']}</td>
+                    <td>{escape(s['employee'])}</td>
                     <td>{s['branch']}</td>
                     <td>{s['check_in']}</td>
                     <td style="{checkout_style}">{s['check_out']}</td>
@@ -279,7 +299,7 @@ class FaceAttendance(http.Controller):
         </head>
         <body>
             <div class="message-box">
-                <p class="message">{message}</p>
+                <p class="message">{escape(message)}</p>
                 {sessions_html}
                 <a href="{branch_link}" class="btn">Volver a Marcar</a>
             </div>

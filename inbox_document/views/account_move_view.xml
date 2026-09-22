@@ -5,8 +5,16 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="after">
+                <div class="alert alert-warning mb-0" role="alert"
+                     invisible="not inbox_requiere_revision or state != 'draft'">
+                    <strong>Revisar:</strong> este documento se generó sin el XML del SRI, con
+                    los valores del archivo TXT. Verifique importes e impuestos antes de validarlo.
+                </div>
+            </xpath>
             <group id="header_left_group" position="inside">
                 <field name="inbox_invoice_id_domain" invisible="1"/>
+                <field name="inbox_requiere_revision" invisible="1"/>
                 <field
                     name="inbox_invoice_id"
                     domain="inbox_invoice_id_domain"

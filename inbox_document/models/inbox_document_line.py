@@ -42,3 +42,12 @@ class InboxDocumentLine(models.Model):
                 line.discount = 0.0
             else:
                 line.discount = (line.discount_amount / gross) * 100.0
+
+    def _get_description(self):
+        """Descripción del XML sin el código de producto que la antecede en ``name``."""
+        self.ensure_one()
+        name = (self.name or '').strip()
+        code = (self.product_code or '').strip()
+        if code and name.startswith(code):
+            name = name[len(code):].strip()
+        return name

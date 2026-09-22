@@ -30,6 +30,10 @@ L10N_EC_TAX_CODES = {
 }
 
 
+# Largo máximo de la etiqueta de una línea agrupada en la factura
+GROUPED_LABEL_MAX_LEN = 300
+
+
 def find_text(node, path, default=''):
     """Devuelve el texto de ``path`` bajo ``node``, o ``default`` si no existe."""
     if node is None:
@@ -79,6 +83,8 @@ class InboxDocument(models.Model):
     partner_id = fields.Many2one(comodel_name='res.partner', string='Proveedor', index=True)
     partner_name = fields.Char(string='Razón Social Emisor')
     fecha_emision = fields.Date(string='Fecha Emisión')
+    valor_sin_impuestos = fields.Float(string='Valor sin Impuestos')
+    iva = fields.Float(string='IVA')
     total = fields.Float(string='Total')
     info_adicional = fields.Text(string='Información Adicional')
 
@@ -99,6 +105,13 @@ class InboxDocument(models.Model):
     )
 
     invoice_id = fields.Many2one(comodel_name='account.move', string='Factura', copy=False)
+
+    requiere_revision = fields.Boolean(
+        string='Requiere revisión',
+        copy=False,
+        help='El XML del SRI no pudo obtenerse y el detalle se generó con los valores '
+             'del archivo TXT. Hay que verificar importes e impuestos.',
+    )
 
     # ===================================================================================
     # Helpers
@@ -212,6 +225,36 @@ class InboxDocument(models.Model):
             self._prepare_partner_vals(ruc, razon_social)
         )
 
+    def _ensure_partner(self, fallback_ruc=None, fallback_name=None):
+        """Busca o crea el proveedor a partir del RUC y la razón social del TXT.
+
+        El XML solo se usa como respaldo si el TXT no trajo el RUC, porque hay
+        comprobantes cuyo XML viene incompleto.
+        """
+        self.ensure_one()
+        ruc = self.ruc_emisor or fallback_ruc
+        razon_social = self.partner_name or fallback_name
+        if not ruc:
+            return self.partner_id
+
+        partner = self.partner_id
+        if partner.vat != ruc:
+            partner = self.env['res.partner'].search([('vat', '=', ruc)], limit=1)
+        if not partner:
+            partner = self._create_partner(ruc, razon_social)
+            self.sudo().crear_nota(
+                'El proveedor "%s" con RUC "%s" no estaba registrado y fue creado automáticamente.'
+                % (razon_social or '', ruc)
+            )
+
+        vals = {'partner_id': partner.id}
+        if not self.ruc_emisor:
+            vals['ruc_emisor'] = ruc
+        if not self.partner_name and razon_social:
+            vals['partner_name'] = razon_social
+        self.write(vals)
+        return partner
+
     def _prepare_line_vals(self, line_nodes, is_credit_note=False):
         """Construye los vals de ``inbox.document.xml.detail`` desde los nodos ``detalle``."""
         self.ensure_one()
@@ -283,15 +326,12 @@ class InboxDocument(models.Model):
         info_tributaria = tree.find('.//infoTributaria')
         info_node = tree.find('.//infoNotaCredito' if is_credit_note else './/infoFactura')
 
-        ruc_emisor = find_text(info_tributaria, 'ruc')
-        partner_name = find_text(info_tributaria, 'razonSocial')
-        partner = self.env['res.partner'].search([('vat', '=', ruc_emisor)], limit=1)
-        if not partner and ruc_emisor:
-            partner = self._create_partner(ruc_emisor, partner_name)
-            self.sudo().crear_nota(
-                'El proveedor "%s" con RUC "%s" no estaba registrado y fue creado automáticamente.'
-                % (partner_name, ruc_emisor)
-            )
+        # El proveedor sale del TXT; el XML es solo respaldo. Debe resolverse antes
+        # de homologar productos.
+        self._ensure_partner(
+            fallback_ruc=find_text(info_tributaria, 'ruc'),
+            fallback_name=find_text(info_tributaria, 'razonSocial'),
+        )
 
         numero_comprobante = '-'.join([
             find_text(info_tributaria, 'estab'),
@@ -302,19 +342,16 @@ class InboxDocument(models.Model):
         total = find_text(info_node, 'importeTotal') or find_text(info_node, 'valorModificacion')
 
         vals = {
-            'ruc_emisor': ruc_emisor,
-            'partner_id': partner.id,
-            'partner_name': partner_name,
             'numero_comprobante': numero_comprobante,
             'clave_acceso': find_text(info_tributaria, 'claveAcceso') or self.clave_acceso,
             'info_adicional': self._parse_info_adicional(tree),
+            'requiere_revision': False,
         }
         if fecha_emision:
             vals['fecha_emision'] = datetime.strptime(fecha_emision, '%d/%m/%Y').date()
         if total:
             vals['total'] = float(total)
 
-        # El partner debe estar escrito antes de homologar productos.
         self.write(vals)
 
         line_nodes = tree.findall('.//detalles/detalle')
@@ -326,27 +363,66 @@ class InboxDocument(models.Model):
         dt_invoice = self.env.ref('l10n_ec.ec_dt_01')
         dt_credit_note = self.env.ref('l10n_ec.ec_dt_04')
         for rec in self:
-            if not rec.xml_recibido:
+            if rec.tipo_documento not in (dt_invoice, dt_credit_note):
+                rec.sudo().crear_nota(
+                    'El tipo de documento "%s" no está soportado; solo se procesan '
+                    'facturas y notas de crédito.' % (rec.tipo_documento.display_name or '')
+                )
                 continue
+            is_credit_note = rec.tipo_documento == dt_credit_note
+            move_type = 'in_refund' if is_credit_note else 'in_invoice'
             try:
-                tree = rec._get_xml_tree()
+                tree = None
+                if rec.xml_recibido:
+                    try:
+                        tree = rec._get_xml_tree()
+                    except etree.XMLSyntaxError as error:
+                        rec.sudo().crear_nota('El XML recibido no es válido: %s' % error)
                 if tree is None:
+                    rec._ensure_partner()
+                    rec._build_fallback_line()
+                    rec._link_existing_move(move_type)
                     continue
-                if rec.tipo_documento == dt_invoice:
-                    has_warnings = rec._parse_comprobante(tree)
-                    rec._link_existing_move('in_invoice', has_warnings)
-                elif rec.tipo_documento == dt_credit_note:
-                    has_warnings = rec._parse_comprobante(tree, is_credit_note=True)
-                    rec._link_existing_move('in_refund', has_warnings)
-                else:
-                    rec.sudo().crear_nota(
-                        'El tipo de documento "%s" no está soportado; solo se procesan '
-                        'facturas y notas de crédito.' % (rec.tipo_documento.display_name or '')
-                    )
+                has_warnings = rec._parse_comprobante(tree, is_credit_note=is_credit_note)
+                rec._link_existing_move(move_type, has_warnings)
             except Exception as error:  # noqa: BLE001 - se registra en el chatter
                 _logger.exception('Error procesando el XML de %s', rec.clave_acceso)
                 rec.estado = 'error'
                 rec.sudo().crear_nota(str(error))
+
+    def _build_fallback_line(self):
+        """Detalle de respaldo cuando no se pudo obtener el XML del SRI.
+
+        Genera una única línea con los valores del TXT: cantidad 1, precio unitario
+        igual a VALOR_SIN_IMPUESTOS e IVA 15% si la columna IVA es mayor a cero.
+        Marca el documento para revisión.
+        """
+        self.ensure_one()
+        taxes = self.env['account.tax']
+        if self.iva > 0:
+            taxes, ec_type = self._find_tax('2', '4', '15')
+            if not taxes:
+                self.sudo().crear_nota(
+                    'No se encontró un impuesto de compra de tipo "%s" (IVA 15%%); '
+                    'la línea quedó sin impuesto.' % ec_type
+                )
+        self.write({
+            'line_ids': [Command.clear(), Command.create({
+                'name': 'Comprobante %s sin XML del SRI'
+                        % (self.numero_comprobante or self.clave_acceso or ''),
+                'quantity': 1.0,
+                'price_unit': self.valor_sin_impuestos,
+                'discount_amount': 0.0,
+                'tax_ids': [Command.set(taxes.ids)],
+            })],
+            'requiere_revision': True,
+        })
+        self.sudo().crear_nota(
+            'No se pudo obtener el XML del SRI. Se generó una línea única con los valores '
+            'del archivo TXT (valor sin impuestos: %.2f, IVA: %.2f). '
+            'Revise importes e impuestos antes de crear el documento.'
+            % (self.valor_sin_impuestos, self.iva)
+        )
 
     def _link_existing_move(self, move_type, has_warnings=False):
         """Vincula el documento con un ``account.move`` ya existente, si lo hubiera.
@@ -421,7 +497,9 @@ class InboxDocument(models.Model):
 
         Las líneas del XML que comparten exactamente los mismos impuestos se suman
         en un único renglón, con cantidad 1 y el subtotal neto (ya descontado) como
-        precio unitario.
+        precio unitario. La etiqueta concatena las descripciones del XML (sin el
+        código de producto, que en modo agrupado se ignora), hasta
+        ``GROUPED_LABEL_MAX_LEN`` caracteres.
         """
         self.ensure_one()
         currency = self.company_id.currency_id
@@ -429,14 +507,20 @@ class InboxDocument(models.Model):
         for line in self.line_ids:
             taxes = self._get_line_taxes(line, fiscal_position)
             key = tuple(sorted(taxes.ids))
-            group = groups.setdefault(key, {'taxes': taxes, 'subtotal': 0.0})
+            group = groups.setdefault(key, {'taxes': taxes, 'subtotal': 0.0, 'names': []})
             group['subtotal'] += line.quantity * line.price_unit - line.discount_amount
+            description = line._get_description()
+            if description and description not in group['names']:
+                group['names'].append(description)
 
         commands = []
         for group in groups.values():
             taxes = group['taxes']
+            label = ', '.join(group['names']) or self.numero_comprobante or '/'
+            if len(label) > GROUPED_LABEL_MAX_LEN:
+                label = label[:GROUPED_LABEL_MAX_LEN - 3].rstrip(' ,') + '...'
             commands.append(Command.create({
-                'name': ', '.join(taxes.mapped('name')) or 'Sin impuestos',
+                'name': label,
                 'quantity': 1.0,
                 'price_unit': currency.round(group['subtotal']),
                 'discount': 0.0,

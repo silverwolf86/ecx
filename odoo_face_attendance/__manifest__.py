@@ -13,23 +13,14 @@ Check In and Check Out using Face Recognition for Any Devices.
     'author': "Ye Htut Swe",
     'website': "yehtutswe59@gmail.com",
 
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/15.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
-    'category': 'HR',
-    'version': '0.1',
+    'category': 'Human Resources/Attendances',
+    'version': '19.0.1.0.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','hr_attendance','web'],
-    'images' : ['static/description/icon.png'],
-    # always loaded
-    'data': [
-        # 'security/ir.model.access.csv',
-        # 'views/hr_attendance.xml',
-    ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
-    ],
+    'depends': ['hr', 'hr_attendance'],
+    'external_dependencies': {
+        'python': ['face_recognition', 'numpy'],
+    },
+    'images': ['static/description/icon.png'],
+    'data': [],
 }
-

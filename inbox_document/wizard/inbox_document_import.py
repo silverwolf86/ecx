@@ -31,10 +31,11 @@ class InboxDocumentImport(models.TransientModel):
     )
 
     def importar_archivo_txt(self):
-        # Layout del TXT del portal del SRI (índices tal como los consume este parser):
-        # 00: RUC_EMISOR          03: SERIE_COMPROBANTE   04: CLAVE_ACCESO
-        # 05: FECHA_AUTORIZACION  06: FECHA_EMISION       07: IDENTIFICACION_RECEPTOR
-        # 10: IMPORTE_TOTAL
+        # Layout del TXT "Recibidos" del portal del SRI (separado por tabulador):
+        # 00: RUC_EMISOR            04: CLAVE_ACCESO            08: VALOR_SIN_IMPUESTOS
+        # 01: RAZON_SOCIAL_EMISOR   05: FECHA_AUTORIZACION      09: IVA
+        # 02: TIPO_COMPROBANTE      06: FECHA_EMISION           10: IMPORTE_TOTAL
+        # 03: SERIE_COMPROBANTE     07: IDENTIFICACION_RECEPTOR 11: NUMERO_DOCUMENTO_MODIFICADO
         self.ensure_one()
         if not self.txt:
             raise ValidationError('No ha cargado ningún archivo.')
@@ -56,7 +57,7 @@ class InboxDocumentImport(models.TransientModel):
                 if fila.strip() and documento:
                     # Línea suelta posterior a un comprobante: es su importe total.
                     try:
-                        documento.total = float(fila.strip())
+                        documento.total = float(fila.strip().replace(',', '.'))
                     except ValueError:
                         pass
                 continue
@@ -73,7 +74,7 @@ class InboxDocumentImport(models.TransientModel):
                     % (company_vat, company.display_name)
                 )
 
-            clave_acceso = campos[4]
+            clave_acceso = campos[4].strip()
             if not clave_acceso:
                 continue
             if model_document.search_count([('clave_acceso', '=', clave_acceso)], limit=1):
@@ -87,20 +88,31 @@ class InboxDocumentImport(models.TransientModel):
                 continue
 
             documento = model_document.create({
-                'numero_comprobante': campos[3] or False,
-                'ruc_emisor': campos[0] or False,
+                'numero_comprobante': campos[3].strip() or False,
+                'ruc_emisor': campos[0].strip() or False,
+                'partner_name': campos[1].strip() or False,
                 'company_id': company.id,
                 'fecha_emision': self._parse_date(campos[6], '%d/%m/%Y'),
                 'fecha_autorizacion': self._parse_date(campos[5], '%d/%m/%Y %H:%M:%S'),
                 'tipo_documento': document_type.id,
                 'clave_acceso': clave_acceso,
                 'agrupar': self.agrupar,
-                'total': float(campos[10] or 0),
+                'valor_sin_impuestos': self._parse_float(campos[8]),
+                'iva': self._parse_float(campos[9]),
+                'total': self._parse_float(campos[10]),
             })
+            documento._ensure_partner()
             self.consultar_ws_con_clave_acceso(documento)
             documento.procesar_xml()
 
         return self.render_inbox_document()
+
+    @api.model
+    def _parse_float(self, value):
+        try:
+            return float((value or '0').strip().replace(',', '.'))
+        except ValueError:
+            return 0.0
 
     @api.model
     def _parse_date(self, value, fmt):
