@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Formulario de plantilla de contrato / versión -->
+    <record id="hr_contract_template_form_view_ecuador" model="ir.ui.view">
+        <field name="name">hr.version.view.form.inherit.hfit.payroll.ecuador</field>
+        <field name="model">hr.version</field>
+        <field name="inherit_id" ref="hr.hr_contract_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='allowances']" position="after">
+                <group string="Nómina Ecuador" name="payroll_ecuador">
+                    <field name="part_time_percentage"/>
+                    <field name="decimo13_mensual"/>
+                    <field name="decimo14_mensual"/>
+                    <field name="fondos_reserva_acumula"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Pestaña Nómina del empleado (hr.employee hereda hr.version vía _inherits) -->
+    <record id="view_employee_form_ecuador" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.inherit.hfit.payroll.ecuador</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='payroll_information']//group[@name='contract']" position="after">
+                <group string="Nómina Ecuador" name="payroll_ecuador" groups="hr.group_hr_user">
+                    <field name="part_time_percentage"/>
+                    <field name="decimo13_mensual"/>
+                    <field name="decimo14_mensual"/>
+                    <field name="fondos_reserva_acumula"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

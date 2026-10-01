@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- ============================================================ -->
+        <!-- CATEGORIA DE PROVISIONES                                      -->
+        <!-- Las provisiones (DEC13_PROV, DEC14_PROV, FR_PROV, PROVAC) van -->
+        <!-- en su propia categoría para que NO se sumen a categories.ALW  -->
+        <!-- / categories.DED y por tanto no afecten el NET. IESSPATR usa  -->
+        <!-- la categoría estándar COMP (aporte de la compañía).           -->
+        <!-- ============================================================ -->
+
+        <record id="hr_salary_rule_category_prov_ec" model="hr.salary.rule.category">
+            <field name="name">Provisiones</field>
+            <field name="code">PROV</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- NOTA: las condiciones usan condition_select="range" (expresión -->
+        <!-- booleana, min=max=1) porque la rama "python" de                -->
+        <!-- hr_payroll_community llama safe_eval(nocopy=True), argumento   -->
+        <!-- que no existe en Odoo 19 y siempre falla.                      -->
+        <!-- ============================================================ -->
+
+        <!-- ============================================================ -->
+        <!-- BASIC                                                          -->
+        <!-- ============================================================ -->
+
+        <record id="hr_salary_rule_basic_ec" model="hr.salary.rule">
+            <field name="name">Sueldo Básico</field>
+            <field name="code">BASIC</field>
+            <field name="sequence">10</field>
+            <field name="category_id" ref="hr_payroll_community.BASIC"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- DECIMO TERCERO (provisión + pago mensualizado condicional)    -->
+        <!-- ============================================================ -->
+
+        <record id="hr_salary_rule_dec13_prov_ec" model="hr.salary.rule">
+            <field name="name">Provisión Décimo Tercero</field>
+            <field name="code">DEC13_PROV</field>
+            <field name="sequence">20</field>
+            <field name="category_id" ref="hr_salary_rule_category_prov_ec"/>
+            <field name="appears_on_payslip" eval="False"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage / 12</field>
+        </record>
+
+        <record id="hr_salary_rule_dec13_pago_ec" model="hr.salary.rule">
+            <field name="name">Décimo Tercero Mensualizado</field>
+            <field name="code">DEC13_PAGO</field>
+            <field name="sequence">21</field>
+            <field name="category_id" ref="hr_payroll_community.ALW"/>
+            <field name="condition_select">range</field>
+            <field name="condition_range">contract.decimo13_mensual</field>
+            <field name="condition_range_min">1</field>
+            <field name="condition_range_max">1</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage / 12</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- DECIMO CUARTO (sobre SBU prorrateado por % jornada)           -->
+        <!-- ============================================================ -->
+
+        <record id="hr_salary_rule_dec14_prov_ec" model="hr.salary.rule">
+            <field name="name">Provisión Décimo Cuarto</field>
+            <field name="code">DEC14_PROV</field>
+            <field name="sequence">22</field>
+            <field name="category_id" ref="hr_salary_rule_category_prov_ec"/>
+            <field name="appears_on_payslip" eval="False"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">sbu = 482.0  # TODO: mover a ir.config_parameter
+result = (sbu / 12) * contract.part_time_percentage</field>
+        </record>
+
+        <record id="hr_salary_rule_dec14_pago_ec" model="hr.salary.rule">
+            <field name="name">Décimo Cuarto Mensualizado</field>
+            <field name="code">DEC14_PAGO</field>
+            <field name="sequence">23</field>
+            <field name="category_id" ref="hr_payroll_community.ALW"/>
+            <field name="condition_select">range</field>
+            <field name="condition_range">contract.decimo14_mensual</field>
+            <field name="condition_range_min">1</field>
+            <field name="condition_range_max">1</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">sbu = 482.0  # TODO: mover a ir.config_parameter
+result = (sbu / 12) * contract.part_time_percentage</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- FONDOS DE RESERVA (solo tras 1 año; pago mensual condicional  -->
+        <!-- a que NO se acumulen en el IESS)                              -->
+        <!-- Se usa contract_date_start porque en Odoo 19 date_start se    -->
+        <!-- reinicia con cada nueva hr.version. El aniversario se compara -->
+        <!-- como tupla (año, mes, día) = date_start + relativedelta(1 año)-->
+        <!-- (29/02 pasa a 28/02), sin necesitar relativedelta.            -->
+        <!-- ============================================================ -->
+
+        <record id="hr_salary_rule_fr_prov_ec" model="hr.salary.rule">
+            <field name="name">Provisión Fondos de Reserva</field>
+            <field name="code">FR_PROV</field>
+            <field name="sequence">30</field>
+            <field name="category_id" ref="hr_salary_rule_category_prov_ec"/>
+            <field name="appears_on_payslip" eval="False"/>
+            <field name="condition_select">range</field>
+            <field name="condition_range">bool(contract.contract_date_start) and (payslip.date_to.year, payslip.date_to.month, payslip.date_to.day) &gt;= (contract.contract_date_start.year + 1, contract.contract_date_start.month, 28 if (contract.contract_date_start.month, contract.contract_date_start.day) == (2, 29) else contract.contract_date_start.day)</field>
+            <field name="condition_range_min">1</field>
+            <field name="condition_range_max">1</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage * 0.0833</field>
+        </record>
+
+        <record id="hr_salary_rule_fr_pago_ec" model="hr.salary.rule">
+            <field name="name">Fondos de Reserva Mensual</field>
+            <field name="code">FR_PAGO</field>
+            <field name="sequence">31</field>
+            <field name="category_id" ref="hr_payroll_community.ALW"/>
+            <field name="condition_select">range</field>
+            <field name="condition_range">not contract.fondos_reserva_acumula and bool(contract.contract_date_start) and (payslip.date_to.year, payslip.date_to.month, payslip.date_to.day) &gt;= (contract.contract_date_start.year + 1, contract.contract_date_start.month, 28 if (contract.contract_date_start.month, contract.contract_date_start.day) == (2, 29) else contract.contract_date_start.day)</field>
+            <field name="condition_range_min">1</field>
+            <field name="condition_range_max">1</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage * 0.0833</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- IESS (con piso de aporte sobre SBU si el sueldo es menor)     -->
+        <!-- ============================================================ -->
+
+        <record id="hr_salary_rule_iesspers_ec" model="hr.salary.rule">
+            <field name="name">Aporte Personal IESS</field>
+            <field name="code">IESSPERS</field>
+            <field name="sequence">40</field>
+            <field name="category_id" ref="hr_payroll_community.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">sbu = 482.0  # TODO: mover a ir.config_parameter
+base_aporte = contract.wage if contract.wage &gt; sbu else sbu
+result = -(base_aporte * 0.0945)</field>
+        </record>
+
+        <record id="hr_salary_rule_iesspatr_ec" model="hr.salary.rule">
+            <field name="name">Aporte Patronal IESS</field>
+            <field name="code">IESSPATR</field>
+            <field name="sequence">41</field>
+            <field name="category_id" ref="hr_payroll_community.COMP"/>
+            <field name="appears_on_payslip" eval="False"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">sbu = 482.0  # TODO: mover a ir.config_parameter
+base_aporte = contract.wage if contract.wage &gt; sbu else sbu
+result = base_aporte * 0.1115</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- PROVISION VACACIONES                                          -->
+        <!-- ============================================================ -->
+
+        <record id="hr_salary_rule_provac_ec" model="hr.salary.rule">
+            <field name="name">Provisión Vacaciones</field>
+            <field name="code">PROVAC</field>
+            <field name="sequence">50</field>
+            <field name="category_id" ref="hr_salary_rule_category_prov_ec"/>
+            <field name="appears_on_payslip" eval="False"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = contract.wage / 24</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- BONOS Y DESCUENTOS PUNTUALES (vía Other Input Lines)          -->
+        <!-- Los hr.rule.input precargan BONO/DESC en "Other Inputs"     -->
+        <!-- de la nómina. inputs.X devuelve 0.0 si el input no existe.    -->
+        <!-- ============================================================ -->
+
+        <record id="hr_salary_rule_bono_puntual_ec" model="hr.salary.rule">
+            <field name="name">Bonificación Puntual</field>
+            <field name="code">BONO_PUNTUAL</field>
+            <field name="sequence">60</field>
+            <field name="category_id" ref="hr_payroll_community.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.BONO.amount if inputs.BONO else 0</field>
+        </record>
+
+        <record id="hr_rule_input_bono_ec" model="hr.rule.input">
+            <field name="name">Bonificación Puntual</field>
+            <field name="code">BONO</field>
+            <field name="input_id" ref="hr_salary_rule_bono_puntual_ec"/>
+        </record>
+
+        <record id="hr_salary_rule_desc_puntual_ec" model="hr.salary.rule">
+            <field name="name">Descuento Puntual</field>
+            <field name="code">DESC_PUNTUAL</field>
+            <field name="sequence">61</field>
+            <field name="category_id" ref="hr_payroll_community.DED"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = -inputs.DESC.amount if inputs.DESC else 0</field>
+        </record>
+
+        <record id="hr_rule_input_desc_ec" model="hr.rule.input">
+            <field name="name">Descuento Puntual</field>
+            <field name="code">DESC</field>
+            <field name="input_id" ref="hr_salary_rule_desc_puntual_ec"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- NETO                                                           -->
+        <!-- ============================================================ -->
+
+        <record id="hr_salary_rule_net_ec" model="hr.salary.rule">
+            <field name="name">Neto a Pagar</field>
+            <field name="code">NET</field>
+            <field name="sequence">100</field>
+            <field name="category_id" ref="hr_payroll_community.NET"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = categories.BASIC + categories.ALW + categories.DED</field>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- ESTRUCTURA                                                     -->
+        <!-- En hr_payroll_community la regla no apunta a la estructura:   -->
+        <!-- la estructura lista sus reglas en rule_ids. parent_id=False   -->
+        <!-- evita heredar BASIC/GROSS/NET de structure_base.              -->
+        <!-- ============================================================ -->
+
+        <record id="hr_payroll_structure_ecuador_mensual" model="hr.payroll.structure">
+            <field name="name">Sueldo Básico Ecuador - Mensual</field>
+            <field name="code">EC_MENSUAL</field>
+            <field name="parent_id" eval="False"/>
+            <field name="rule_ids" eval="[(6, 0, [
+                ref('hr_salary_rule_basic_ec'),
+                ref('hr_salary_rule_dec13_prov_ec'),
+                ref('hr_salary_rule_dec13_pago_ec'),
+                ref('hr_salary_rule_dec14_prov_ec'),
+                ref('hr_salary_rule_dec14_pago_ec'),
+                ref('hr_salary_rule_fr_prov_ec'),
+                ref('hr_salary_rule_fr_pago_ec'),
+                ref('hr_salary_rule_iesspers_ec'),
+                ref('hr_salary_rule_iesspatr_ec'),
+                ref('hr_salary_rule_provac_ec'),
+                ref('hr_salary_rule_bono_puntual_ec'),
+                ref('hr_salary_rule_desc_puntual_ec'),
+                ref('hr_salary_rule_net_ec'),
+            ])]"/>
+        </record>
+
+    </data>
+</odoo>

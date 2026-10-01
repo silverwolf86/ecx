@@ -16,6 +16,7 @@
         'wizard/inbox_document_import_view.xml',
         'views/inbox_document_view.xml',
         'views/account_move_view.xml',
+        'views/res_config_settings_view.xml',
         'views/menuitem.xml',
     ],
     'assets': {

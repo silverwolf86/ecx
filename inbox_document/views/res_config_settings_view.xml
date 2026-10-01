@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="res_config_settings_view_form_inbox_document" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inbox.document</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='account_vendor_bills']" position="after">
+                <block title="Retenciones recibidas (Documentos de Entrada)" id="inbox_document_retenciones">
+                    <setting id="inbox_retencion_accounts" string="Asiento de retención"
+                             company_dependent="1"
+                             help="Diario y cuentas usados por el botón 'Crear asiento de retención'.">
+                        <div class="content-group">
+                            <div class="row mt8">
+                                <label for="inbox_retencion_journal_id" string="Diario" class="col-lg-4 o_light_label"/>
+                                <field name="inbox_retencion_journal_id"
+                                       domain="[('type', '=', 'general'), ('company_id', '=', company_id)]"
+                                       options="{'no_create': True}"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="inbox_retencion_iva_account_id" string="Retención IVA (débito)" class="col-lg-4 o_light_label"/>
+                                <field name="inbox_retencion_iva_account_id" options="{'no_create': True}"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="inbox_retencion_renta_account_id" string="Retención fuente (débito)" class="col-lg-4 o_light_label"/>
+                                <field name="inbox_retencion_renta_account_id" options="{'no_create': True}"/>
+                            </div>
+                            <div class="row mt8">
+                                <label for="inbox_retencion_credit_account_id" string="Contrapartida (crédito)" class="col-lg-4 o_light_label"/>
+                                <field name="inbox_retencion_credit_account_id" options="{'no_create': True}"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

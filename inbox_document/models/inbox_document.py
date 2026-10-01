@@ -29,6 +29,10 @@ L10N_EC_TAX_CODES = {
     '5': 'irbpnr',
 }
 
+# Código del impuesto retenido en el comprobante de retención (<codigo>)
+RETENCION_CODIGO_IVA = '2'
+RETENCION_CODIGO_RENTA = '1'
+
 
 # Largo máximo de la etiqueta de una línea agrupada en la factura
 GROUPED_LABEL_MAX_LEN = 300
@@ -105,6 +109,13 @@ class InboxDocument(models.Model):
     )
 
     invoice_id = fields.Many2one(comodel_name='account.move', string='Factura', copy=False)
+    retencion_move_id = fields.Many2one(
+        comodel_name='account.move',
+        string='Asiento de Retención',
+        copy=False,
+        readonly=True,
+    )
+    tipo_documento_code = fields.Char(related='tipo_documento.code')
 
     requiere_revision = fields.Boolean(
         string='Requiere revisión',
@@ -572,6 +583,122 @@ class InboxDocument(models.Model):
             rec.invoice_id = move
             rec.estado = 'procesado'
             rec.sudo().crear_nota('Documento creado: %s.' % move.display_name)
+
+    # ===================================================================================
+    # Asiento de retención
+    # ===================================================================================
+
+    def _get_retencion_amounts(self, tree):
+        """Suma ``valorRetenido`` por código de impuesto del comprobante de retención.
+
+        Soporta la versión 1.0.0 (``impuestos/impuesto``) y la 2.0.0
+        (``docsSustento/docSustento/retenciones/retencion``) del XML.
+        """
+        amounts = {}
+        nodes = tree.findall('.//impuestos/impuesto') + tree.findall('.//retenciones/retencion')
+        for node in nodes:
+            valor = find_text(node, 'valorRetenido')
+            if not valor:
+                continue
+            codigo = find_text(node, 'codigo')
+            amounts[codigo] = amounts.get(codigo, 0.0) + float(valor)
+        return amounts
+
+    def _prepare_retencion_move_vals(self, amounts):
+        self.ensure_one()
+        company = self.company_id
+        currency = company.currency_id
+        ref = 'Retención %s' % (self.numero_comprobante or self.clave_acceso or '')
+        debit_lines = [
+            (RETENCION_CODIGO_IVA, company.inbox_retencion_iva_account_id, 'Retención IVA'),
+            (RETENCION_CODIGO_RENTA, company.inbox_retencion_renta_account_id,
+             'Retención en la fuente'),
+        ]
+
+        line_ids = []
+        total = 0.0
+        for codigo, account, label in debit_lines:
+            amount = currency.round(amounts.get(codigo, 0.0))
+            if currency.is_zero(amount):
+                continue
+            if not account:
+                raise UserError(
+                    'Configure la cuenta de "%s" en Ajustes > Contabilidad > '
+                    'Retenciones recibidas.' % label
+                )
+            total += amount
+            line_ids.append(Command.create({
+                'name': '%s %s' % (label, self.numero_comprobante or ''),
+                'account_id': account.id,
+                'partner_id': self.partner_id.id,
+                'debit': amount,
+                'credit': 0.0,
+            }))
+        if not line_ids:
+            raise UserError(
+                'El comprobante "%s" no tiene valores retenidos de IVA ni de fuente.'
+                % (self.numero_comprobante or self.clave_acceso)
+            )
+
+        line_ids.append(Command.create({
+            'name': ref,
+            'account_id': company.inbox_retencion_credit_account_id.id,
+            'partner_id': self.partner_id.id,
+            'debit': 0.0,
+            'credit': currency.round(total),
+        }))
+        return {
+            'move_type': 'entry',
+            'company_id': company.id,
+            'journal_id': company.inbox_retencion_journal_id.id,
+            'date': self.fecha_emision or fields.Date.context_today(self),
+            'ref': ref,
+            'inbox_invoice_id': self.id,
+            'line_ids': line_ids,
+        }
+
+    def create_retencion_move(self):
+        dt_retencion = self.env.ref('l10n_ec.ec_dt_07')
+        for rec in self:
+            if rec.retencion_move_id:
+                continue
+            name = rec.numero_comprobante or rec.clave_acceso
+            if rec.tipo_documento != dt_retencion:
+                raise UserError('El documento "%s" no es un comprobante de retención.' % name)
+            company = rec.company_id
+            if not company.inbox_retencion_journal_id:
+                raise UserError(
+                    'Configure el diario de retenciones en Ajustes > Contabilidad > '
+                    'Retenciones recibidas.'
+                )
+            if not company.inbox_retencion_credit_account_id:
+                raise UserError(
+                    'Configure la cuenta de contrapartida de retenciones en Ajustes > '
+                    'Contabilidad > Retenciones recibidas.'
+                )
+            try:
+                tree = rec._get_xml_tree()
+            except etree.XMLSyntaxError as error:
+                raise UserError('El XML del documento "%s" no es válido: %s' % (name, error))
+            if tree is None:
+                raise UserError('El documento "%s" no tiene XML recibido.' % name)
+
+            info_tributaria = tree.find('.//infoTributaria')
+            rec._ensure_partner(
+                fallback_ruc=find_text(info_tributaria, 'ruc'),
+                fallback_name=find_text(info_tributaria, 'razonSocial'),
+            )
+            if not rec.fecha_emision:
+                fecha_emision = find_text(tree.find('.//infoCompRetencion'), 'fechaEmision')
+                if fecha_emision:
+                    rec.fecha_emision = datetime.strptime(fecha_emision, '%d/%m/%Y').date()
+
+            amounts = rec._get_retencion_amounts(tree)
+            move = self.env['account.move'].with_company(company).create(
+                rec._prepare_retencion_move_vals(amounts)
+            )
+            rec.write({'retencion_move_id': move.id, 'estado': 'procesado'})
+            rec.sudo().crear_nota('Asiento de retención creado: %s.' % move.display_name)
 
     def unlink(self):
         procesados = self.filtered(lambda doc: doc.estado == 'procesado')

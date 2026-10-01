@@ -11,6 +11,9 @@
                     <button name="create_invoice" type="object" string="Crear Documento"
                             class="oe_highlight"
                             invisible="estado == 'procesado' or not line_ids"/>
+                    <button name="create_retencion_move" type="object"
+                            string="Crear asiento de retención" class="oe_highlight"
+                            invisible="tipo_documento_code != '07' or retencion_move_id or not xml_recibido"/>
                     <field name="estado" widget="statusbar"
                            statusbar_visible="cargado,consultado,procesado"/>
                 </header>
@@ -42,6 +45,8 @@
                             <field name="agrupar"/>
                             <field name="requiere_revision" invisible="1"/>
                             <field name="invoice_id" readonly="1"/>
+                            <field name="retencion_move_id" invisible="not retencion_move_id"/>
+                            <field name="tipo_documento_code" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
