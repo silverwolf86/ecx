@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import base64
 
-MIN_DAYS_PAUSE = 90
+MIN_DAYS_PAUSE = 10
 MAX_DAYS_PAUSE = 30
 
 class PauseSubscriptionWizard(models.TransientModel):
