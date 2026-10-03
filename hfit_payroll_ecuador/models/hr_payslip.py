@@ -1,9 +1,74 @@
-from odoo import _, models
+from datetime import datetime, time
+
+import babel.dates
+
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
+
+    def _get_payslip_name(self, employee, date_from):
+        locale = self.env.context.get('lang') or 'en_US'
+        period = babel.dates.format_date(
+            date=datetime.combine(fields.Date.to_date(date_from), time.min),
+            format='MMMM-y', locale=locale)
+        return _('Nomina de %(employee)s para %(period)s',
+                 employee=employee.name, period=period)
+
+    def _get_default_struct(self):
+        """Primera estructura salarial que se encuentre."""
+        return self.env['hr.payroll.structure'].search([], limit=1)
+
+    def _get_struct_inputs(self, struct, contract, date_from, date_to):
+        """Igual que get_inputs, pero para una estructura que no es la del
+        contrato."""
+        rule_ids = struct._get_parent_structure().get_all_rules()
+        sorted_rule_ids = [rule_id for rule_id, _sequence in
+                           sorted(rule_ids, key=lambda x: x[1])]
+        inputs = self.env['hr.salary.rule'].browse(sorted_rule_ids).input_ids
+        return [{
+            'name': rule_input.name,
+            'code': rule_input.code,
+            'contract_id': contract.id,
+            'date_from': date_from,
+            'date_to': date_to,
+        } for rule_input in inputs]
+
+    def onchange_employee_id(self, date_from, date_to, employee_id=False,
+                             contract_id=False):
+        res = super().onchange_employee_id(
+            date_from, date_to, employee_id=employee_id, contract_id=contract_id)
+        if not employee_id or not date_from or not date_to:
+            return res
+        value = res['value']
+        value['name'] = self._get_payslip_name(
+            self.env['hr.employee'].browse(employee_id), date_from)
+        if not value.get('struct_id'):
+            # El contrato no tiene estructura: se usa la primera que exista.
+            # El método original termina antes de calcular días e inputs.
+            struct = self._get_default_struct()
+            value['struct_id'] = struct.id
+            contract = self.env['hr.version'].browse(value.get('contract_id'))
+            if struct and contract:
+                value.update({
+                    'worked_days_line_ids': self.get_worked_day_lines(
+                        contract, date_from, date_to),
+                    'input_line_ids': self._get_struct_inputs(
+                        struct, contract, date_from, date_to),
+                })
+        return res
+
+    @api.onchange('employee_id')
+    def onchange_employee(self):
+        res = super().onchange_employee()
+        if not self.employee_id or not self.date_from or not self.date_to:
+            return res
+        self.name = self._get_payslip_name(self.employee_id, self.date_from)
+        if not self.struct_id:
+            self.struct_id = self._get_default_struct()
+        return res
 
     def action_register_payment_payslip(self):
         """Abre el asistente estándar de pagos sobre la línea del NET del

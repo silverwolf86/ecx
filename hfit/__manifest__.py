@@ -1,6 +1,6 @@
 {
     'name': 'hfit',
-    'version': '1.1',
+    'version': '1.2',
     'summary': 'hfit',
     'description': 'hfit',
     'author': 'Franco',
@@ -27,6 +27,8 @@
         'views/pause_subscription_wizard.xml',
         'views/pos_payment_method_views.xml',
         'views/virtuagym_log_views.xml',
+        'views/res_partner_bank_views.xml',
+        'report/account_payment_bank_txt.xml',
         #'data/ir_cron_resume_paused_subscriptions.xml',
     ],
     'assets': {

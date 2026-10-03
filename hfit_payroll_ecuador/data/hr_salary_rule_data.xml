@@ -33,7 +33,22 @@
             <field name="category_id" ref="hr_payroll_community.BASIC"/>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage</field>
+            <field name="amount_python_compute"># Días trabajados en mes comercial de 30 días, recortados por el inicio/fin
+# del contrato dentro del período. El último día del mes cuenta como día 30.
+desde = payslip.date_from
+hasta = payslip.date_to
+if contract.contract_date_start and contract.contract_date_start &gt; desde:
+    desde = contract.contract_date_start
+if contract.contract_date_end and contract.contract_date_end &lt; hasta:
+    hasta = contract.contract_date_end
+if desde &gt; hasta:
+    dias = 0
+else:
+    ultimo_dia_mes = hasta.fromordinal(hasta.toordinal() + 1).month != hasta.month
+    dia_fin = 30 if ultimo_dia_mes else min(hasta.day, 30)
+    dias = max(dia_fin - min(desde.day, 30) + 1, 0)
+# contract.wage ya es el sueldo real (incluye la jornada parcial).
+result = contract.wage / 30 * dias</field>
         </record>
 
         <!-- ============================================================ -->
@@ -48,7 +63,7 @@
             <field name="appears_on_payslip" eval="False"/>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage / 12</field>
+            <field name="amount_python_compute">result = categories.BASIC / 12</field>
         </record>
 
         <record id="hr_salary_rule_dec13_pago_ec" model="hr.salary.rule">
@@ -61,7 +76,7 @@
             <field name="condition_range_min">1</field>
             <field name="condition_range_max">1</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage / 12</field>
+            <field name="amount_python_compute">result = categories.BASIC / 12</field>
         </record>
 
         <!-- ============================================================ -->
@@ -77,7 +92,9 @@
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">sbu = 482.0  # TODO: mover a ir.config_parameter
-result = (sbu / 12) * contract.part_time_percentage</field>
+# Días trabajados del mes comercial, deducidos del BASIC (wage / 30 × días)
+dias = categories.BASIC / contract.wage * 30 if contract.wage else 0
+result = sbu * contract.part_time_percentage / 12 / 30 * dias</field>
         </record>
 
         <record id="hr_salary_rule_dec14_pago_ec" model="hr.salary.rule">
@@ -91,7 +108,9 @@ result = (sbu / 12) * contract.part_time_percentage</field>
             <field name="condition_range_max">1</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">sbu = 482.0  # TODO: mover a ir.config_parameter
-result = (sbu / 12) * contract.part_time_percentage</field>
+# Días trabajados del mes comercial, deducidos del BASIC (wage / 30 × días)
+dias = categories.BASIC / contract.wage * 30 if contract.wage else 0
+result = sbu * contract.part_time_percentage / 12 / 30 * dias</field>
         </record>
 
         <!-- ============================================================ -->
@@ -114,7 +133,7 @@ result = (sbu / 12) * contract.part_time_percentage</field>
             <field name="condition_range_min">1</field>
             <field name="condition_range_max">1</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage * 0.0833</field>
+            <field name="amount_python_compute">result = categories.BASIC * 0.0833</field>
         </record>
 
         <record id="hr_salary_rule_fr_pago_ec" model="hr.salary.rule">
@@ -127,7 +146,7 @@ result = (sbu / 12) * contract.part_time_percentage</field>
             <field name="condition_range_min">1</field>
             <field name="condition_range_max">1</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage * 0.0833</field>
+            <field name="amount_python_compute">result = categories.BASIC * 0.0833</field>
         </record>
 
         <!-- ============================================================ -->
@@ -142,7 +161,9 @@ result = (sbu / 12) * contract.part_time_percentage</field>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">sbu = 482.0  # TODO: mover a ir.config_parameter
-base_aporte = contract.wage if contract.wage &gt; sbu else sbu
+# Piso legal: SBU proporcional a la jornada y a los días trabajados del BASIC
+proporcion = contract.part_time_percentage * categories.BASIC / contract.wage if contract.wage else 0
+base_aporte = max(categories.BASIC, sbu * proporcion)
 result = -(base_aporte * 0.0945)</field>
         </record>
 
@@ -155,8 +176,10 @@ result = -(base_aporte * 0.0945)</field>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">sbu = 482.0  # TODO: mover a ir.config_parameter
-base_aporte = contract.wage if contract.wage &gt; sbu else sbu
-result = base_aporte * 0.1115</field>
+# Días trabajados del mes comercial, deducidos del BASIC (wage / 30 × días)
+dias = categories.BASIC / contract.wage * 30 if contract.wage else 0
+# SBU × 11.15%, por los días trabajados en el mes, dividido para 30
+result = (sbu * 0.1115) * dias / 30</field>
         </record>
 
         <!-- ============================================================ -->
@@ -171,7 +194,7 @@ result = base_aporte * 0.1115</field>
             <field name="appears_on_payslip" eval="False"/>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = contract.wage / 24</field>
+            <field name="amount_python_compute">result = categories.BASIC / 24</field>
         </record>
 
         <!-- ============================================================ -->

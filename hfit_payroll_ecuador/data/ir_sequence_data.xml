@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- La secuencia es noupdate en hr_payroll_community: se reescribe el
+         prefijo de la referencia de la nómina (SLIP/ -> NOMINA/). -->
+    <function model="ir.sequence" name="write">
+        <value eval="[ref('hr_payroll_community.seq_salary_slip')]"/>
+        <value eval="{'name': 'Nómina', 'prefix': 'NOMINA/'}"/>
+    </function>
+</odoo>

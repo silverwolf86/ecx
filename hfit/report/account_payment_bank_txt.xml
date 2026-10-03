@@ -4,8 +4,8 @@
         <field name="name">Archivo Banco (TXT)</field>
         <field name="model">account.payment</field>
         <field name="report_type">qweb-text</field>
-        <field name="report_name">hfit_payroll_ecuador.report_account_payment_bank_txt</field>
-        <field name="report_file">hfit_payroll_ecuador.report_account_payment_bank_txt</field>
+        <field name="report_name">hfit.report_account_payment_bank_txt</field>
+        <field name="report_file">hfit.report_account_payment_bank_txt</field>
         <field name="print_report_name">'pago_banco_%s' % (object.memo or object.name)</field>
         <field name="binding_model_id" ref="account.model_account_payment"/>
         <field name="binding_type">report</field>

@@ -11,3 +11,5 @@ from . import pos_payment_method
 from . import res_partner_pos
 from . import product_template
 from . import virtuagym_log
+from . import account_payment
+from . import res_partner_bank
