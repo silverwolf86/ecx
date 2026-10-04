@@ -9,6 +9,12 @@ from odoo.exceptions import UserError
 class HrPayslip(models.Model):
     _inherit = 'hr.payslip'
 
+    payment_ids = fields.Many2many(
+        'account.payment', 'hr_payslip_account_payment_rel', 'payslip_id', 'payment_id',
+        string='Pagos', copy=False, readonly=True,
+        help='Pagos registrados contra el asiento de esta nómina.',
+    )
+
     def _get_payslip_name(self, employee, date_from):
         locale = self.env.context.get('lang') or 'en_US'
         period = babel.dates.format_date(
@@ -36,6 +42,68 @@ class HrPayslip(models.Model):
             'date_to': date_to,
         } for rule_input in inputs]
 
+    # Inputs que toda nómina debe tener, con monto 0 para llenarlos a mano.
+    DEFAULT_INPUT_XMLIDS = (
+        'hfit_payroll_ecuador.hr_rule_input_bono_ec',
+        'hfit_payroll_ecuador.hr_rule_input_desc_ec',
+        'hfit_payroll_ecuador.hr_rule_input_sobretiempo_ec',
+    )
+
+    @api.model
+    def _add_default_inputs(self, inputs, contracts, date_from, date_to):
+        """Agrega a la lista de dicts `inputs` los inputs por defecto que
+        falten, uno por contrato."""
+        rule_inputs = self.env['hr.rule.input']
+        for xmlid in self.DEFAULT_INPUT_XMLIDS:
+            rule_inputs |= self.env.ref(xmlid, raise_if_not_found=False) or rule_inputs
+        existing = {(line['code'], line['contract_id']) for line in inputs}
+        for contract in contracts:
+            for rule_input in rule_inputs:
+                if (rule_input.code, contract.id) not in existing:
+                    inputs.append({
+                        'name': rule_input.name,
+                        'code': rule_input.code,
+                        'amount': 0.0,
+                        'contract_id': contract.id,
+                        'date_from': date_from,
+                        'date_to': date_to,
+                    })
+        return inputs
+
+    @api.model
+    def get_inputs(self, contracts, date_from, date_to):
+        inputs = super().get_inputs(contracts, date_from, date_to)
+        return self._add_default_inputs(inputs, contracts, date_from, date_to)
+
+    def _ensure_default_inputs(self):
+        for slip in self:
+            contract = slip.contract_id or self.env['hr.version'].browse(
+                self.get_contract(slip.employee_id, slip.date_from, slip.date_to)[:1])
+            if not contract:
+                continue
+            existing = [{'code': line.code, 'contract_id': line.contract_id.id}
+                        for line in slip.input_line_ids]
+            missing = self._add_default_inputs(
+                list(existing), contract, slip.date_from, slip.date_to)[len(existing):]
+            if missing:
+                slip.write({'input_line_ids': [(0, 0, vals) for vals in missing]})
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        slips = super().create(vals_list)
+        slips._ensure_default_inputs()
+        return slips
+
+    def write(self, vals):
+        res = super().write(vals)
+        if 'contract_id' in vals:
+            # Los inputs siguen al contrato de la nómina.
+            for slip in self.filtered('contract_id'):
+                slip.input_line_ids.filtered(
+                    lambda line: line.contract_id != slip.contract_id
+                ).write({'contract_id': slip.contract_id.id})
+        return res
+
     def onchange_employee_id(self, date_from, date_to, employee_id=False,
                              contract_id=False):
         res = super().onchange_employee_id(
@@ -55,8 +123,9 @@ class HrPayslip(models.Model):
                 value.update({
                     'worked_days_line_ids': self.get_worked_day_lines(
                         contract, date_from, date_to),
-                    'input_line_ids': self._get_struct_inputs(
-                        struct, contract, date_from, date_to),
+                    'input_line_ids': self._add_default_inputs(
+                        self._get_struct_inputs(struct, contract, date_from, date_to),
+                        contract, date_from, date_to),
                 })
         return res
 

@@ -1,8 +1,14 @@
-from odoo import api, models
+from odoo import api, fields, models
 
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
+
+    payslip_ids = fields.Many2many(
+        'hr.payslip', 'hr_payslip_account_payment_rel', 'payment_id', 'payslip_id',
+        string='Nóminas', copy=False, readonly=True,
+        help='Nóminas que se pagaron con este pago.',
+    )
 
     @api.model_create_multi
     def create(self, vals_list):

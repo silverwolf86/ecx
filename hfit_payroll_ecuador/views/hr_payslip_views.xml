@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_payslip_view_form_ecuador" model="ir.ui.view">
+        <field name="name">hr.payslip.view.form.inherit.hfit.payroll.ecuador</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll_account_community.hr_payslip_view_form"/>
+        <field name="arch" type="xml">
+            <field name="move_id" position="after">
+                <field name="payment_ids" widget="many2many_tags"
+                       groups="account.group_account_invoice"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="hr_payslip_view_tree_ecuador" model="ir.ui.view">
+        <field name="name">hr.payslip.view.list.inherit.hfit.payroll.ecuador</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll_community.hr_payslip_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="before">
+                <field name="payment_ids" widget="many2many_tags" optional="show"
+                       groups="account.group_account_invoice"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Pestaña "Worked Days & Inputs": primero Other Inputs, luego Worked Days -->
+    <record id="hr_payslip_view_form_inputs_first_ecuador" model="ir.ui.view">
+        <field name="name">hr.payslip.view.form.inputs.first.hfit.payroll.ecuador</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll_community.hr_payslip_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page//separator[@string='Worked Days']" position="before">
+                <xpath expr="//page//separator[@string='Other Inputs']" position="move"/>
+                <xpath expr="//page//field[@name='input_line_ids']" position="move"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

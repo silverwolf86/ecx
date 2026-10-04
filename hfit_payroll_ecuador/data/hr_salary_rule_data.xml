@@ -203,9 +203,11 @@ result = -((base_aporte + SOBRET) * 0.0945)</field>
             <field name="amount_python_compute">sbu = 482.0  # TODO: mover a ir.config_parameter
 # Días trabajados del mes comercial, deducidos del BASIC (wage / 30 × días)
 dias = categories.BASIC / contract.wage * 30 if contract.wage else 0
-# SBU × 11.15%, por los días trabajados en el mes, dividido para 30
-# más el 11.15% del sobretiempo, que también es base de aportación
-result = (sbu * 0.1115) * dias / 30 + SOBRET * 0.1115</field>
+# Base: el sueldo del período, con piso del SBU proporcional a los días
+# trabajados (el sueldo ya incluye la jornada parcial). El sobretiempo se
+# suma encima, igual que en el aporte personal.
+base_aporte = max(categories.BASIC, sbu * dias / 30)
+result = (base_aporte + SOBRET) * 0.1115</field>
         </record>
 
         <!-- ============================================================ -->

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_form_ecuador" model="ir.ui.view">
+        <field name="name">account.payment.form.inherit.hfit.payroll.ecuador</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <field name="memo" position="after">
+                <field name="payslip_ids" widget="many2many_tags" invisible="not payslip_ids"
+                       groups="hr_payroll_community.group_hr_payroll_community_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_payment_tree_ecuador" model="ir.ui.view">
+        <field name="name">account.payment.list.inherit.hfit.payroll.ecuador</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="payslip_ids" widget="many2many_tags" optional="hide"
+                       groups="hr_payroll_community.group_hr_payroll_community_user"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_payment_search_ecuador" model="ir.ui.view">
+        <field name="name">account.payment.search.inherit.hfit.payroll.ecuador</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+            <filter name="outbound_filter" position="after">
+                <filter string="Pagos de Nómina" name="payslip_filter"
+                        domain="[('payslip_ids', '!=', False)]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>
