@@ -1,6 +1,6 @@
 {
     'name': 'HFIT Payroll Ecuador',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.3.0',
     'category': 'Human Resources',
     'summary': 'Reglas salariales y campos de contrato para nómina de Ecuador '
                '(décimos, fondos de reserva, IESS, provisiones) y pago de '

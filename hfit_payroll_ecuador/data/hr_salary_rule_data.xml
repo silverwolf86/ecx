@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
 
         <!-- ============================================================ -->
         <!-- CATEGORIA DE PROVISIONES                                      -->
@@ -51,6 +51,30 @@ else:
 result = contract.wage / 30 * dias</field>
         </record>
 
+          <!-- ============================================================ -->
+        <!-- SOBRETIEMPO (horas extra/suplementarias, puntual vía input)   -->
+        <!-- Es base gravable IESS: IESSPERS/IESSPATR la suman abajo con   -->
+        <!-- la variable SOBRET (total de la regla, ya calculada: seq 15). -->
+        <!-- ============================================================ -->
+ 
+        <record id="hr_salary_rule_sobretiempo_ec" model="hr.salary.rule">
+            <field name="name">Sobretiempos</field>
+            <field name="code">SOBRET</field>
+            <field name="sequence">15</field>
+            <field name="category_id" ref="hr_payroll_community.ALW"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.SOBRET.amount if inputs.SOBRET else 0</field>
+        </record>
+
+        <record id="hr_rule_input_sobretiempo_ec" model="hr.rule.input">
+            <field name="name">Sobretiempos</field>
+            <field name="code">SOBRET</field>
+            <field name="input_id" ref="hr_salary_rule_sobretiempo_ec"/>
+        </record>
+ 
+
+
         <!-- ============================================================ -->
         <!-- DECIMO TERCERO (provisión + pago mensualizado condicional)    -->
         <!-- ============================================================ -->
@@ -63,7 +87,7 @@ result = contract.wage / 30 * dias</field>
             <field name="appears_on_payslip" eval="False"/>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = categories.BASIC / 12</field>
+            <field name="amount_python_compute">result = (categories.BASIC + SOBRET) / 12</field>
         </record>
 
         <record id="hr_salary_rule_dec13_pago_ec" model="hr.salary.rule">
@@ -76,7 +100,7 @@ result = contract.wage / 30 * dias</field>
             <field name="condition_range_min">1</field>
             <field name="condition_range_max">1</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = categories.BASIC / 12</field>
+            <field name="amount_python_compute">result = (categories.BASIC + SOBRET) / 12</field>
         </record>
 
         <!-- ============================================================ -->
@@ -164,7 +188,8 @@ result = sbu * contract.part_time_percentage / 12 / 30 * dias</field>
 # Piso legal: SBU proporcional a la jornada y a los días trabajados del BASIC
 proporcion = contract.part_time_percentage * categories.BASIC / contract.wage if contract.wage else 0
 base_aporte = max(categories.BASIC, sbu * proporcion)
-result = -(base_aporte * 0.0945)</field>
+# El sobretiempo es remuneración gravable: se suma a la base del aporte
+result = -((base_aporte + SOBRET) * 0.0945)</field>
         </record>
 
         <record id="hr_salary_rule_iesspatr_ec" model="hr.salary.rule">
@@ -179,7 +204,8 @@ result = -(base_aporte * 0.0945)</field>
 # Días trabajados del mes comercial, deducidos del BASIC (wage / 30 × días)
 dias = categories.BASIC / contract.wage * 30 if contract.wage else 0
 # SBU × 11.15%, por los días trabajados en el mes, dividido para 30
-result = (sbu * 0.1115) * dias / 30</field>
+# más el 11.15% del sobretiempo, que también es base de aportación
+result = (sbu * 0.1115) * dias / 30 + SOBRET * 0.1115</field>
         </record>
 
         <!-- ============================================================ -->
@@ -262,6 +288,7 @@ result = (sbu * 0.1115) * dias / 30</field>
             <field name="parent_id" eval="False"/>
             <field name="rule_ids" eval="[(6, 0, [
                 ref('hr_salary_rule_basic_ec'),
+                ref('hr_salary_rule_sobretiempo_ec'),
                 ref('hr_salary_rule_dec13_prov_ec'),
                 ref('hr_salary_rule_dec13_pago_ec'),
                 ref('hr_salary_rule_dec14_prov_ec'),
