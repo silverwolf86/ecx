@@ -13,17 +13,26 @@ class AccountPayment(models.Model):
         # Si el pago se creó sin cuenta del beneficiario, se usa la primera
         # cuenta bancaria del contacto.
         bank = self.partner_bank_id or partner.bank_ids[:1]
+        # Hay proveedores con RUC cuya cuenta está a nombre de una persona con
+        # cédula: en ese caso la cédula se guarda en el clearing_number de la
+        # cuenta y tiene prioridad sobre el vat del contacto.
+        if bank.clearing_number:
+            vat = bank.clearing_number
+            tipo_doc = 'C'
+        else:
+            vat = partner.vat
+            tipo_doc = (partner.l10n_latam_identification_type_id.name or '')[0:1]
         return [
             'PA',                                                       # codigo
-            partner.vat,                                                # contrapartida
+            vat,                                                        # contrapartida
             'USD',                                                      # moneda
             str(round(self.amount * 100)),                              # valor (centavos, sin punto)
             'CTA',                                                      # cta
             bank.account_type,                                          # tipo_cuenta
             bank.acc_number,                                            # numero_cuenta
             self.memo,                                                  # referencia
-            (partner.l10n_latam_identification_type_id.name or '')[0:1],  # tipo_doc
-            partner.vat,                                                # cedula
+            tipo_doc,                                                   # tipo_doc
+            vat,                                                        # cedula
             partner.name,                                               # beneficiario
             bank.bank_id.bic,                                           # banco
         ]

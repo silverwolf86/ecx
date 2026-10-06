@@ -204,10 +204,10 @@ result = -((base_aporte + SOBRET) * 0.0945)</field>
 # Días trabajados del mes comercial, deducidos del BASIC (wage / 30 × días)
 dias = categories.BASIC / contract.wage * 30 if contract.wage else 0
 # Base: el sueldo del período, con piso del SBU proporcional a los días
-# trabajados (el sueldo ya incluye la jornada parcial). El sobretiempo se
-# suma encima, igual que en el aporte personal.
+# trabajados (el sueldo ya incluye la jornada parcial). El sobretiempo NO
+# entra en el aporte patronal.
 base_aporte = max(categories.BASIC, sbu * dias / 30)
-result = (base_aporte + SOBRET) * 0.1115</field>
+result = base_aporte * 0.1115</field>
         </record>
 
         <!-- ============================================================ -->
