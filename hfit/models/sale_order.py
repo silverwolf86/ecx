@@ -348,6 +348,15 @@ class SaleOrder(models.Model):
             return False
 
         start_date = self.start_date or self.date_order.date()
+        # Descuento de la orden frente al precio de la membresía en Virtuagym (el
+        # Anual figura en 552 y se cobra 331). Lo calcula quien valida el pago —el
+        # kiosko, que lee ese precio de Virtuagym— y lo pasa en el contexto.
+        discount = float(self.env.context.get('virtuagym_discount') or 0)
+        custom_discount = {
+            'discount_amount': discount,
+            'discount_amount_type': 'monetary',
+            'discount_start_date': start_date.strftime('%Y-%m-%d'),
+        } if discount > 0 else None
         is_created, _contract_id, msg = self.partner_id.create_virtuagym_membership_instance(
             branch=self.branch_id,
             membership_id=membership_id,
@@ -355,6 +364,7 @@ class SaleOrder(models.Model):
             payment_method=self._get_virtuagym_payment_method(),
             salesperson_id=salesperson_id,
             sale_order=self,
+            custom_discount=custom_discount,
         )
         if not is_created:
             _logger.warning(

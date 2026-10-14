@@ -52,7 +52,8 @@ class SaleOrder(models.Model):
             
         if is_recurring:
             # Caso 1: Suscripción
-            end_date = begin_date + relativedelta(years=1)
+            end_date = min(begin_date + relativedelta(years=10),
+                           begin_date.replace(year=2037, month=12, day=31))
         else:
             # Caso 2: Duración no recurrente
             max_days = 0

@@ -221,7 +221,7 @@ class ResPartner(models.Model):
             self._log_virtuagym_action('create', branch, api_url, {'params': params, 'body': body}, error=str(e))
             return False, None, str(e)
 
-    def create_virtuagym_membership_instance(self, branch, membership_id, start_date, payment_method, salesperson_id, sale_order=None):
+    def create_virtuagym_membership_instance(self, branch, membership_id, start_date, payment_method, salesperson_id, sale_order=None, custom_discount=None):
         """Crea una membership instance (contrato) en Virtuagym para este socio,
         a partir de una definición de membresía (membership_id) ya existente en el club.
         """
@@ -249,6 +249,8 @@ class ResPartner(models.Model):
             "payment_method": payment_method,
             "salesperson_id": salesperson_id,
         }
+        if custom_discount:
+            body["custom_discount"] = custom_discount
 
         try:
             response = requests.post(api_url, params=params, json=body)
