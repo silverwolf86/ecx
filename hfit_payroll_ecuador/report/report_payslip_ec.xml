@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Reemplaza el reporte "Payslip Details" de hr_payroll_community. -->
+    <record id="hr_payroll_community.hr_payslip_report_action" model="ir.actions.report">
+        <field name="name">Rol de Pago Individual</field>
+        <field name="report_name">hfit_payroll_ecuador.report_payslip_ec</field>
+        <field name="report_file">hfit_payroll_ecuador.report_payslip_ec</field>
+        <field name="print_report_name">'Rol de pago - %s' % object.employee_id.name</field>
+    </record>
+
+    <template id="report_payslip_ec">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="v" t-value="values[o.id]"/>
+                <t t-set="currency" t-value="o.company_id.currency_id"/>
+                <t t-set="bank" t-value="o.employee_id.bank_account_ids[:1]"/>
+                <div class="page" style="font-size: 11px; font-family: Arial, sans-serif;">
+                    <table style="width: 100%;">
+                        <tr>
+                            <td style="width: 25%;">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)"
+                                     style="max-height: 70px;" alt="Logo"/>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="font-size: 20px; font-weight: bold;"><t t-esc="o.company_id.name"/></div>
+                                <div style="font-size: 18px;">ROL DE PAGO INDIVIDUAL</div>
+                                <div style="font-size: 13px;">CORRESPONDIENTE A NOMINA DE <t t-esc="v['month']"/></div>
+                            </td>
+                            <td style="width: 25%;"/>
+                        </tr>
+                    </table>
+                    <div style="margin-top: 4px;">
+                        <strong>EMISIÓN:</strong> <t t-esc="now.strftime('%d-%m-%Y %H:%M')"/>
+                    </div>
+                    <div style="border-top: 1px solid #000;">
+                        <strong>EMPLEADO:</strong>
+                        <t t-esc="o.employee_id.identification_id"/>
+                        &#160;&#160;<t t-esc="o.employee_id.name"/>
+                    </div>
+
+                    <table style="width: 100%; margin-top: 2px;">
+                        <tr>
+                            <td style="width: 49%; vertical-align: top;">
+                                <div style="background: #bbb; text-align: center; font-weight: bold;">INGRESOS</div>
+                                <table style="width: 100%;">
+                                    <tr t-foreach="v['ingresos']" t-as="line">
+                                        <td><t t-esc="line.name"/></td>
+                                        <td style="text-align: right; white-space: nowrap;">
+                                            <span t-esc="line.total" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="width: 2%;"/>
+                            <td style="width: 49%; vertical-align: top;">
+                                <div style="background: #bbb; text-align: center; font-weight: bold;">EGRESOS</div>
+                                <table style="width: 100%;">
+                                    <tr t-foreach="v['egresos']" t-as="line">
+                                        <td><t t-esc="line.name"/></td>
+                                        <td style="text-align: right; white-space: nowrap;">
+                                            <span t-esc="line.total" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-top: 14px;">
+                                <table style="width: 100%; font-weight: bold;">
+                                    <tr>
+                                        <td>Total Ingresos ===&gt;</td>
+                                        <td style="text-align: right; border-top: 1px solid #000; border-bottom: 1px solid #000; width: 40%;">
+                                            <span t-esc="v['total_ingresos']" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td/>
+                            <td style="padding-top: 14px;">
+                                <table style="width: 100%; font-weight: bold;">
+                                    <tr>
+                                        <td>Total Egresos ===&gt;</td>
+                                        <td style="text-align: right; border-top: 1px solid #000; border-bottom: 1px solid #000; width: 40%;">
+                                            <span t-esc="v['total_egresos']" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-top: 8px;">Salario neto ===&gt;</td>
+                                        <td style="text-align: right; border-bottom: 1px solid #000; padding-top: 8px;">
+                                            <span t-esc="v['total_ingresos'] + v['total_egresos']" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div t-if="bank" style="margin-top: 4px;">
+                        Pagar en <strong><t t-esc="bank.acc_number"/> - <t t-esc="bank.bank_id.name"/></strong>
+                        de <em><t t-esc="o.employee_id.name"/></em> :
+                        <span t-esc="v['total_ingresos'] + v['total_egresos']" t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                    </div>
+
+                    <table style="width: 100%; margin-top: 90px;">
+                        <tr>
+                            <td style="width: 45%; border-top: 1px solid #000; text-align: center;">
+                                Elaborado por <t t-esc="user_name"/>
+                            </td>
+                            <td style="width: 10%;"/>
+                            <td style="width: 45%; border-top: 1px solid #000; text-align: center;">
+                                Recibí conforme <t t-esc="o.employee_id.name"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

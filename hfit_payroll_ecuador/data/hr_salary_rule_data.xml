@@ -207,7 +207,7 @@ dias = categories.BASIC / contract.wage * 30 if contract.wage else 0
 # trabajados (el sueldo ya incluye la jornada parcial). El sobretiempo NO
 # entra en el aporte patronal.
 base_aporte = max(categories.BASIC, sbu * dias / 30)
-result = base_aporte * 0.1115</field>
+result = base_aporte * 0.1215</field>
         </record>
 
         <!-- ============================================================ -->

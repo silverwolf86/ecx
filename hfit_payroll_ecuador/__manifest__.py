@@ -10,6 +10,7 @@
     'data': [
         'data/hr_salary_rule_data.xml',
         'data/hr_payslip_actions.xml',
+        'report/report_payslip_ec.xml',
         'data/ir_sequence_data.xml',
         'views/hr_version_views.xml',
         'views/hr_payslip_views.xml',
