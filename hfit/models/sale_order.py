@@ -347,7 +347,7 @@ class SaleOrder(models.Model):
             )
             return False
 
-        start_date = self.start_date or self.date_order.date()
+        start_date = self.start_date or self._fecha_ecuador()
         # Descuento de la orden frente al precio de la membresía en Virtuagym (el
         # Anual figura en 552 y se cobra 331). Lo calcula quien valida el pago —el
         # kiosko, que lee ese precio de Virtuagym— y lo pasa en el contexto.
@@ -435,12 +435,12 @@ class SaleOrder(models.Model):
                 break
     
     def _compute_start_date(self):
-        super()._compute_start_date()
+        #super()._compute_start_date()
         for so in self:
             if not so.is_subscription:
                 so.start_date = False
             elif not so.start_date:
-                so.start_date = so.date_order
+                so.start_date = so._fecha_ecuador()                
 
 
     @api.model
@@ -671,6 +671,15 @@ class SaleOrder(models.Model):
         values['order_line'] = []
 
         return values
+
+    TZ_ECUADOR = 'America/Guayaquil'
+    def _fecha_ecuador(self):
+        """El día de la orden en Ecuador (date_order se guarda en UTC)."""
+        self.ensure_one()
+        return fields.Datetime.context_timestamp(
+            self.with_context(tz=self.TZ_ECUADOR),
+            self.date_order or fields.Datetime.now()).date()
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

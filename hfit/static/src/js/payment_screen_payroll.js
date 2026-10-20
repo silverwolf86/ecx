@@ -42,7 +42,7 @@ patch(OrderPaymentValidation.prototype, {
             return false;
         }
 
-        if (!partner.pos_employee_id) {
+        if (false) {
             this.pos.dialog.add(AlertDialog, {
                 title: _t("Empleado no encontrado"),
                 body: _t(

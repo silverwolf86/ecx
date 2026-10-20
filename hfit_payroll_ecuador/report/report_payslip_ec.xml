@@ -14,7 +14,8 @@
                 <t t-set="v" t-value="values[o.id]"/>
                 <t t-set="currency" t-value="o.company_id.currency_id"/>
                 <t t-set="bank" t-value="o.employee_id.bank_account_ids[:1]"/>
-                <div class="page" style="font-size: 11px; font-family: Arial, sans-serif;">
+                <div class="article page" t-att-data-oe-model="o._name" t-att-data-oe-id="o.id"
+                     t-att-data-oe-lang="o.env.context.get('lang')" style="font-size: 11px; font-family: Arial, sans-serif;">
                     <table style="width: 100%;">
                         <tr>
                             <td style="width: 25%;">
