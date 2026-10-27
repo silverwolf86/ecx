@@ -10,6 +10,7 @@
     """,
     'depends': [
         'ecx_edi',
+        'inbox_document',
     ],
     'data': [
         'security/ir.model.access.csv',

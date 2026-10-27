@@ -6,6 +6,8 @@ from odoo.tools import float_repr, float_round, groupby
 from odoo.exceptions import ValidationError
 from odoo.addons.l10n_ec.models.res_partner import PartnerIdTypeEc
 from odoo.addons.ecx_edi.models.account_move import L10N_EC_VAT_TAX_NOT_ZERO_GROUPS
+from odoo.addons.inbox_document.models.inbox_document import RETENCION_CODIGO_IVA, RETENCION_CODIGO_RENTA
+from lxml import etree
 
 import unicodedata
 import re
@@ -17,6 +19,10 @@ ATS_SALE_DOCUMENT_TYPE = {
     '01': '18',
     '02': '18',
 }
+# Received withholdings are reported in the sales section as a document type 18, electronic, paid with "others" (20)
+ATS_WITHHOLDING_DOCUMENT_CODE = '18'
+ATS_WITHHOLDING_EMISSION_TYPE = 'E'
+ATS_WITHHOLDING_PAYMENT_CODE = '20'
 
 
 class EcxAtsReportHandler(models.AbstractModel):
@@ -429,6 +435,8 @@ class EcxAtsReportHandler(models.AbstractModel):
         # Order sale invoice by partner RUC. _get_sales_info_by_partner groups invoices by partner vat.
         sale_vals, sales_info_errors = self._get_sales_info_by_partner(invoices_values)
         errors += sales_info_errors
+        # Withholdings received from customers (inbox.document) are added to the sales section
+        errors += self._add_received_withholdings(sale_vals, date_start, date_finish)
 
         values = {}
         if sale_vals:
@@ -573,28 +581,108 @@ class EcxAtsReportHandler(models.AbstractModel):
                     'formasDePago': partner_invoices_values[0]['formasDePago'],
                 })
 
-            # Conditional field only when the supplier code type is equal to
-            #   - 04: RUC
-            #   - 05: CEDULA
-            #   - 06: PASSPORT
-            # Also is conditional with the document type code
-            #   - 18: is the ATS document code for  '01' and '02' sales types
-            #   - 04: Credit Notes
-            #   - 05: Debit Notes
-            #   - 44: Contributions and Contribution Voucher
-            if (identification_type_code in ['04', '05', '06'] and
-                    any(invoice_values['tipoComprobante'] in ['18', '04', '05', '44'] for invoice_values in partner_invoices_values)):
-                values.update({
-                    'parteRelVtas': 'SI' if partner.l10n_ec_related_party else 'NO'
-                })
-
-            if identification_type_code == '06':
-                values.update({
-                    'tipoCliente': '02' if partner.is_company else '01',
-                    'denoCli': partner.commercial_partner_id.commercial_company_name or partner.commercial_partner_id.name
-                })
+            values.update(self._get_sales_partner_conditional_vals(
+                partner, identification_type_code, [v['tipoComprobante'] for v in partner_invoices_values]
+            ))
             group_sales[id_partner] = values
         return group_sales, errors
+
+    @api.model
+    def _get_sales_partner_conditional_vals(self, partner, identification_type_code, document_codes):
+        values = {}
+        # Conditional field only when the supplier code type is equal to
+        #   - 04: RUC
+        #   - 05: CEDULA
+        #   - 06: PASSPORT
+        # Also is conditional with the document type code
+        #   - 18: is the ATS document code for  '01' and '02' sales types
+        #   - 04: Credit Notes
+        #   - 05: Debit Notes
+        #   - 44: Contributions and Contribution Voucher
+        if (identification_type_code in ['04', '05', '06'] and
+                any(code in ['18', '04', '05', '44'] for code in document_codes)):
+            values['parteRelVtas'] = 'SI' if partner.l10n_ec_related_party else 'NO'
+
+        if identification_type_code == '06':
+            values.update({
+                'tipoCliente': '02' if partner.is_company else '01',
+                'denoCli': partner.commercial_partner_id.commercial_company_name or partner.commercial_partner_id.name
+            })
+        return values
+
+    @api.model
+    def _add_received_withholdings(self, sale_vals, date_start, date_finish):
+        """ Add the withholdings received from customers (inbox.document of type withholding) to ``sale_vals``.
+
+        The amounts are added to the existing electronic type 18 row of the customer. If the customer has no such
+        row, a new one is created with every base and tax amount in zero and only the withheld values filled in. """
+        errors = []
+        documents = self.env['inbox.document'].search([
+            ('company_id', '=', self.env.company.id),
+            ('tipo_documento', '=', self.env.ref('l10n_ec.ec_dt_07').id),
+            ('xml_recibido', '!=', False),
+            ('fecha_emision', '>=', date_start),
+            ('fecha_emision', '<=', date_finish),
+        ], order='partner_id, fecha_emision, id')
+
+        withholdings = {}
+        for document in documents:
+            name = document.numero_comprobante or document.clave_acceso
+            if not document.partner_id:
+                errors.append(_("%s: The received withholding has no customer.", name))
+                continue
+            try:
+                tree = document._get_xml_tree()
+            except etree.XMLSyntaxError:
+                errors.append(_("%s: The XML of the received withholding is not valid.", name))
+                continue
+            amounts = document._get_retencion_amounts(tree) if tree is not None else {}
+            vat_withheld = amounts.get(RETENCION_CODIGO_IVA, 0.0)
+            income_withheld = amounts.get(RETENCION_CODIGO_RENTA, 0.0)
+            if not vat_withheld and not income_withheld:
+                continue
+            partner = document.partner_id.commercial_partner_id
+            data = withholdings.setdefault(partner, {'partner': document.partner_id, 'count': 0, 'vat': 0.0, 'income': 0.0})
+            data['count'] += 1
+            data['vat'] += vat_withheld
+            data['income'] += income_withheld
+
+        for partner, data in withholdings.items():
+            row_key = next((
+                key for key, row in sale_vals.items()
+                if key[0] == partner
+                and row['tipoComprobante'] == ATS_WITHHOLDING_DOCUMENT_CODE
+                and row['tipoEmision'] == ATS_WITHHOLDING_EMISSION_TYPE
+            ), None)
+            if row_key:
+                sale_vals[row_key]['valorRetIva'] += data['vat']
+                sale_vals[row_key]['valorRetRenta'] += data['income']
+                continue
+
+            identification_type_code = PartnerIdTypeEc.get_ats_code_for_partner(data['partner'], 'out_').value
+            id_cliente, validation_errors = self._l10n_ec_get_validated_partner_vat(data['partner'])
+            errors += validation_errors
+            values = {
+                'numeroComprobantes': data['count'],
+                'tipoComprobante': ATS_WITHHOLDING_DOCUMENT_CODE,
+                'tipoEmision': ATS_WITHHOLDING_EMISSION_TYPE,
+                'compensaciones': {'tipoCompe': '0', 'monto': 0},
+                'tpIdCliente': identification_type_code or '',
+                'idCliente': id_cliente or '',
+                'valorRetIva': data['vat'],
+                'valorRetRenta': data['income'],
+                'baseNoGraIva': 0.0,
+                'baseImponible': 0.0,
+                'baseImpGrav': 0.0,
+                'montoIva': 0.0,
+                'amount_untaxed_signed': 0.0,
+                'formasDePago': [ATS_WITHHOLDING_PAYMENT_CODE],
+            }
+            values.update(self._get_sales_partner_conditional_vals(
+                data['partner'], identification_type_code, [ATS_WITHHOLDING_DOCUMENT_CODE]
+            ))
+            sale_vals[(partner, 'withholding', ATS_WITHHOLDING_EMISSION_TYPE)] = values
+        return errors
 
     # =====  HELPERS  =====
     @api.model
