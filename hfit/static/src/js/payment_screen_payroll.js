@@ -52,6 +52,18 @@ patch(OrderPaymentValidation.prototype, {
             return false;
         }
 
+        // Lo cobrado con descuento a rol es consumo del personal: se descuenta en
+        // el rol y no se factura (decisión del 4-nov-2026). ecx_edi_pos abre cada
+        // venta con «Factura» marcada; aquí se desmarca cuando todo lo demás ya
+        // está bien. El servidor hace lo mismo (models/pos_payment_method.py).
+        if (this.order.isToInvoice() && !this.order.finalized) {
+            this.order.setToInvoice(false);
+            this.pos.notification.add(
+                _t("Descuento a rol: el consumo del personal se registra sin factura."),
+                { type: "info" }
+            );
+        }
+
         return true;
     },
 });

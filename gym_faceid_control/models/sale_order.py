@@ -55,7 +55,10 @@ class SaleOrder(models.Model):
             end_date = min(begin_date + relativedelta(years=10),
                            begin_date.replace(year=2037, month=12, day=31))
         else:
-            # Caso 2: Duración no recurrente
+            # Caso 2: Duración no recurrente. Entra hasta el día anterior al
+            # mismo día del período siguiente, como los períodos de Virtuagym:
+            # 28-sep + 1 mes -> hasta el 27-oct; 16-feb + 1 mes -> hasta el 15-mar.
+            # Antes entraba también ese día: un día de más (JP, 28-oct-2026).
             max_days = 0
             for line in self.order_line:
                 product = line.product_template_id
@@ -77,10 +80,12 @@ class SaleOrder(models.Model):
                     delta_days = (test_end - begin_date).days
                     if delta_days > max_days:
                         max_days = delta_days
-                        end_date = test_end
+                        end_date = test_end - relativedelta(days=1)
                         
             # Si ninguna linea sumó días, le damos 1 día por defecto o lo que se prefiera
-            if end_date == begin_date:
+            # (Con el día de fin restado, un producto de 1 día termina el mismo día
+            # que empieza: por eso se mira si alguna línea sumó, no la fecha.)
+            if not max_days:
                 end_date = begin_date + relativedelta(days=1)
 
         begin_time_str = f"{begin_date.strftime('%Y-%m-%d')}T00:00:00"
