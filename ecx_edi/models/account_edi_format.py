@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import logging
+_logger = logging.getLogger(__name__)
+
 from datetime import datetime
 from functools import partial
 from uuid import uuid4
 
 from lxml import etree
 from markupsafe import Markup, escape
+
+
+
 
 from odoo import _, api, models
 from odoo.addons.ecx_edi.models.account_move import L10N_EC_VAT_SUBTAXES
@@ -477,12 +483,17 @@ class AccountEdiFormat(models.Model):
 
             # Parse govt's response for errors or response state
             if response_state == 'DEVUELTA':
+                if not isinstance(response_checks, list):
+                    response_checks = [response_checks]
                 for check in response_checks:
-                    for msg in check['mensajes']['mensaje']:
-                        if msg['identificador'] != '43':  # 43 means Authorization number already registered
+                    mensajes = (check and check['mensajes'] and check['mensajes']['mensaje']) or []
+                    if not isinstance(mensajes, list):
+                        mensajes = [mensajes]
+                    for msg in mensajes:
+                        if msg['identificador'] != '43':  # 43 = clave de acceso ya registrada
                             errors.append(' - '.join(
                                 filter(None, [msg['identificador'], msg['informacionAdicional'], msg['mensaje'], msg['tipo']])
-                            ))
+                            ))                
             elif response_state != 'RECIBIDA':
                 errors.append(_("SRI response state: %s", response_state))
 
@@ -515,7 +526,6 @@ class AccountEdiFormat(models.Model):
         return self._l10n_ec_get_authorization_status_new(move.company_id, move.l10n_ec_authorization_number)
 
     def _l10n_ec_get_authorization_status_new(self, company_id, l10n_ec_authorization_number):
-        # TODO master: merge this with `_l10n_ec_get_authorization_status`
         auth_state, auth_num, auth_date = None, None, None
 
         response, zeep_errors, zeep_warnings = self._l10n_ec_get_client_service_response_new(
@@ -524,32 +534,50 @@ class AccountEdiFormat(models.Model):
         )
         if zeep_errors:
             return auth_state, auth_num, auth_date, zeep_errors, zeep_warnings
-        try:
-            response_auth_list = response['autorizaciones'] and response['autorizaciones']['autorizacion'] or []
-        except (AttributeError, TypeError) as err:
-            return auth_state, auth_num, auth_date, [_("SRI response unexpected: %s", err)], zeep_warnings
 
-        errors = []
+        try:
+            autorizaciones = response['autorizaciones'] if response else None
+            response_auth_list = (autorizaciones and autorizaciones['autorizacion']) or []
+        except (AttributeError, TypeError, KeyError):
+            _logger.warning("SRI: respuesta de autorización inesperada para %s: %r",
+                            l10n_ec_authorization_number, response, exc_info=True)
+            response_auth_list = []
+
         if not isinstance(response_auth_list, list):
             response_auth_list = [response_auth_list]
 
+        if not response_auth_list:
+            # El SRI aún no devuelve el comprobante (en cola / respuesta vacía): reintentar luego
+            return 'EN PROCESO', auth_num, auth_date, [], zeep_warnings
+
+        errors = []
         for doc in response_auth_list:
-            auth_state = doc['estado']
-            if doc['estado'] == "AUTORIZADO":
+            if not doc:
+                continue
+            state = doc['estado']
+            if state == 'AUTORIZADO':
+                auth_state = state
                 auth_num = doc['numeroAutorizacion']
                 auth_date = doc['fechaAutorizacion']
-            else:
-                messages = doc['mensajes']
-                if messages:
-                    messages_list = messages['mensaje']
-                    if not isinstance(messages_list, list):
-                        messages_list = messages
-                    for msg in messages_list:
-                        errors.append(' - '.join(
-                            filter(None, [msg['identificador'], msg['informacionAdicional'], msg['mensaje'], msg['tipo']])
-                        ))
-        return auth_state, auth_num, auth_date, errors, zeep_warnings
+                continue
+            auth_state = auth_state or state
+            messages = doc['mensajes']
+            messages_list = (messages and messages['mensaje']) or []
+            if not isinstance(messages_list, list):
+                messages_list = [messages_list]
+            for msg in messages_list:
+                errors.append(' - '.join(
+                    filter(None, [msg['identificador'], msg['informacionAdicional'], msg['mensaje'], msg['tipo']])
+                ))
 
+        if auth_num:
+            # Si alguna entrada está autorizada, ignorar mensajes de intentos anteriores
+            errors = []
+        elif auth_state in ('EN PROCESO', 'EN PROCESAMIENTO', 'PPR'):
+            auth_state = 'EN PROCESO'
+
+        return auth_state, auth_num, auth_date, errors, zeep_warnings
+    
     def _l10n_ec_get_client_service_response(self, move, mode, **kwargs):
         """
         Government interaction: SOAP Transport and Client management.
@@ -574,7 +602,10 @@ class AccountEdiFormat(models.Model):
             if not response:
                 errors.append(_("No response received."))
         except ZeepError as e:
-            errors.append(_("The SRI service failed with the following error: %s", e))
+            if type(e).__name__ == 'Fault':
+                warnings.append(_("The SRI service failed with the following message: %s", e))
+            else:
+                errors.append(_("The SRI service failed with the following error: %s", e))
         except RequestException as e:
             warnings.append(_("The SRI service failed with the following message: %s", e))
         return response, errors, warnings
